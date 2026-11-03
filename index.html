@@ -1,0 +1,1353 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2a302e">
+<meta name="description" content="PaviaLAB – kalkulator badań lepiszczy asfaltowych według PN-EN.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PaviaLAB">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>PaviaLAB</title>
+<style>
+/* Layout: ekran Start → dane próbki → badania ułożone jedno pod drugim (wpisywanie | wynik) → porównanie wielu próbek */
+:root{
+  --bg:#f3f4f2; --panel:#ffffff; --ink:#1d2321; --muted:#5d6763; --line:#d6dad6;
+  --accent:#e0a100; --accent-ink:#6b4d00; --asphalt:#2a302e;
+  --ok:#2f7d4f; --ok-bg:#e3f2e8; --bad:#b3362a; --bad-bg:#f8e3e0; --warn-bg:#fdf3d6; --base:#3f6f9e; --base-bg:#e2ecf6;
+  --c1:#c98a00; --c2:#3f6f9e; --c3:#b3362a; --c4:#2f7d4f; --c5:#7a4fa3; --c6:#0f7f86;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+.xl{
+  --bg:#f3f4f2; --panel:#ffffff; --ink:#1d2321; --muted:#5d6763; --line:#d6dad6;
+  --accent:#e0a100; --accent-ink:#6b4d00; --asphalt:#2a302e;
+  --ok:#2f7d4f; --ok-bg:#e3f2e8; --bad:#b3362a; --bad-bg:#f8e3e0; --warn-bg:#fdf3d6; --base:#3f6f9e; --base-bg:#e2ecf6;
+  --c1:#c98a00; --c2:#3f6f9e; --c3:#b3362a; --c4:#2f7d4f; --c5:#7a4fa3; --c6:#0f7f86;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+;color-scheme:light;color:var(--ink)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#161a19; --panel:#1f2523; --ink:#e7ebe8; --muted:#9aa5a0; --line:#343c39;
+  --accent:#f0b726; --accent-ink:#f6d27a; --asphalt:#0d100f;
+  --ok:#6cc792; --ok-bg:#1d3326; --bad:#ef8a7e; --bad-bg:#3a2220; --warn-bg:#3a3118; --base:#8fb8e3; --base-bg:#1c2b3a; --c1:#f0b726; --c2:#8fb8e3; --c3:#ef8a7e; --c4:#6cc792; --c5:#c4a2e8; --c6:#5fd0d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161a19; --panel:#1f2523; --ink:#e7ebe8; --muted:#9aa5a0; --line:#343c39;
+  --accent:#f0b726; --accent-ink:#f6d27a; --asphalt:#0d100f;
+  --ok:#6cc792; --ok-bg:#1d3326; --bad:#ef8a7e; --bad-bg:#3a2220; --warn-bg:#3a3118; --base:#8fb8e3; --base-bg:#1c2b3a; --c1:#f0b726; --c2:#8fb8e3; --c3:#ef8a7e; --c4:#6cc792; --c5:#c4a2e8; --c6:#5fd0d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+header{background:var(--asphalt);color:#f1f3f2;padding-block:14px 4px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto}
+.hrow{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;justify-content:space-between;padding-bottom:10px}
+header .brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;font-size:26px;letter-spacing:.03em;line-height:1}
+header .brand .lab,.wordmark .lab{color:var(--accent)}
+.wordmark{padding-top:.18em}
+header .brand{padding-top:4px}
+.logo{display:block;flex:none;--logo-tile:#3a4240;--logo-glass:#eef1ef;--logo-tar:#101312}
+.wordmark{font-family:var(--f-display);font-weight:700;font-size:64px;line-height:.95;letter-spacing:.02em;margin:0}
+.herohead{display:flex;flex-wrap:wrap;align-items:center;gap:18px 22px}
+.herohead .sub{font:500 13px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:#aab4b0;margin-top:6px}
+@media (max-width:480px){.wordmark{font-size:48px}.herohead .logo{width:76px;height:76px}}
+.stripe{height:6px;background:repeating-linear-gradient(90deg,#fff 0 28px,transparent 28px 46px)}
+nav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+nav button{font:600 14px var(--f-body);color:#c8d0cc;background:transparent;border:0;padding:6px 12px;border-radius:6px;cursor:pointer;white-space:nowrap}
+nav button[aria-current="true"]{background:#3d4542;color:#fff}
+nav button:disabled{opacity:.4;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.view{display:grid;gap:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;min-width:0}
+h1{font-family:var(--f-display);font-weight:700;font-size:44px;line-height:1.05;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:700;font-size:24px;margin:0 0 2px;letter-spacing:.01em;text-wrap:balance}
+h3{font-size:15px;margin:0 0 8px}
+.norm{font:500 12px var(--f-mono);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 130px}
+label,.lbl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+input,select,textarea{font:15px var(--f-mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;font-variant-numeric:tabular-nums}
+input[type=checkbox]{width:18px;height:18px;padding:0;accent-color:var(--accent)}
+textarea{min-height:150px;resize:vertical;font-size:13px}
+.reads{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:10px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button.sec{font:500 13px var(--f-body);background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
+button.sec:hover{border-color:var(--accent)}
+button.pri{font:600 15px var(--f-body);background:var(--accent);color:#231a00;border:0;border-radius:6px;padding:10px 18px;cursor:pointer}
+button.danger{color:var(--bad)}
+.note{font-size:13px;color:var(--muted);margin:10px 0 0}
+/* start */
+.hero{display:grid;gap:14px;padding:40px 28px 28px;background:var(--asphalt);color:#eef1ef;border:0;position:relative;overflow:hidden}
+.hero p{max-width:60ch;color:#c3ccc8;margin:0}
+.hero .pri{font-size:18px;padding:14px 34px;letter-spacing:.04em}
+.herobtns{gap:12px}
+.hero .sec{color:#eef1ef;border-color:#5a635f;font-size:15px;padding:12px 18px}
+.hero .sec:hover{border-color:var(--accent)}
+.hero::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:repeating-linear-gradient(90deg,#fff 0 28px,transparent 28px 46px)}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:8px;background:repeating-linear-gradient(90deg,#fff 0 34px,transparent 34px 56px)}
+.steps{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:#aab4b0;margin:0;padding:0;list-style:none}
+.steps li b{color:var(--accent);font-family:var(--f-mono);margin-right:6px}
+/* tabele */
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.delta{display:block;font-size:12px;color:var(--muted)}
+.tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border-radius:4px;background:var(--base-bg);color:var(--base);margin-left:6px;vertical-align:middle}
+.tag.ex{background:var(--warn-bg);color:var(--accent-ink)}
+/* badania jedno pod drugim */
+.tblock{padding:0;overflow:visible}
+.tblock .tout{border-bottom-right-radius:8px}
+@media (max-width:760px){.tblock .tout{border-bottom-left-radius:8px;border-bottom-right-radius:8px}}
+.thead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:flex-end;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
+.thead .status{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.thead .status .field{flex:0 1 220px}
+.tbody{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
+.tin{padding:18px;min-width:0}
+.tout{padding:18px;border-left:1px solid var(--line);background:color-mix(in srgb,var(--bg) 45%,var(--panel));min-width:0}
+@media (max-width:760px){.tbody{grid-template-columns:1fr}.tout{border-left:0;border-top:1px solid var(--line)}}
+.tblock.is-fail{border-color:var(--bad)}
+.big{font:500 40px/1.1 var(--f-mono);font-variant-numeric:tabular-nums;margin:6px 0 2px}
+.big small{font-size:17px;color:var(--muted);margin-left:6px}
+.chip{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;margin:4px 0}
+.chip.ok{background:var(--ok-bg);color:var(--ok)}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.chip.na{background:var(--bg);color:var(--muted)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:12px 0 0;font-size:14px}
+dt{color:var(--muted)} dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.formula{font:13px var(--f-mono);background:var(--bg);border-radius:6px;padding:8px 10px;margin-top:12px;color:var(--muted)}
+.hint{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:14px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.hint b{font-family:var(--f-mono);font-weight:500}
+.hint.base{color:var(--base)}
+.lsets{display:grid;gap:12px}
+.lset{border:1px solid var(--line);border-radius:8px;padding:12px;background:color-mix(in srgb,var(--bg) 40%,var(--panel))}
+.especs{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.espec{border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;gap:8px;background:color-mix(in srgb,var(--bg) 40%,var(--panel));min-width:0}
+.espec-h{display:flex;justify-content:space-between;align-items:center;font-size:14px}
+.espec textarea{min-height:120px}
+.lost{color:var(--bad);font-size:12px}
+.lostrow td{background:color-mix(in srgb,var(--bad-bg) 50%,transparent)}
+.help{position:relative;display:inline-block;vertical-align:middle;margin-left:4px}
+.helpbtn{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--muted);background:transparent;color:var(--muted);font:700 12px var(--f-body);cursor:help;padding:0;line-height:1}
+.helpbtn:hover,.help:focus-within .helpbtn{border-color:var(--accent);color:var(--accent-ink);background:var(--warn-bg)}
+.tip{position:absolute;left:-8px;top:calc(100% + 8px);z-index:40;width:min(400px,calc(100vw - 48px));background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 40px rgba(0,0,0,.28);padding:14px 16px;font:400 13.5px/1.5 var(--f-body);letter-spacing:0;text-transform:none;display:none}
+.help:hover .tip,.help:focus-within .tip,.help.open .tip{display:block;animation:tipin .15s ease-out}
+@keyframes tipin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.help .tip{animation:none!important}}
+@media (max-width:600px){.tip{position:fixed;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));top:auto;bottom:max(12px,env(safe-area-inset-bottom,0px));width:auto;max-height:70vh;overflow-y:auto}}
+.tip b.th{display:block;font-family:var(--f-display);font-size:18px;margin-bottom:6px}
+.tip ol{margin:0;padding-left:20px;display:grid;gap:4px}
+.tip .tn{display:block;margin-top:8px;font-size:12px;color:var(--muted)}
+.notes-wrap{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:760px){.notes-wrap{grid-template-columns:1fr}}
+.nitem{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:9px 11px;margin-bottom:8px;cursor:pointer;font:14px var(--f-body)}
+.nitem.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+.nitem b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nitem span{font-size:12px;color:var(--muted)}
+#noteText{min-height:320px;font:15px/1.6 var(--f-body)}
+.calcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:20px;align-items:start}
+.cdisp{font-size:24px;text-align:right;padding:12px}
+.cres{text-align:right;font:500 30px var(--f-mono);min-height:42px;margin:6px 0 10px;color:var(--accent-ink)}
+.ckeys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ckeys button{font:500 18px var(--f-mono);padding:12px 0;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.ckeys button:hover{border-color:var(--accent)}
+.ckeys button.op{color:var(--accent-ink);font-weight:700}
+.ckeys button.eq{background:var(--accent);color:#231a00;border-color:var(--accent);font-weight:700}
+.nsec{border-top:1px solid var(--line);padding:12px 0 4px}
+.nsec h3{margin:0 0 6px}
+.np{margin:6px 0;font-size:14px}
+.eqrow{display:flex;align-items:center;gap:12px;margin:4px 0}
+.eq{flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;padding:8px 0;scrollbar-width:none}
+.eq::-webkit-scrollbar{display:none}
+.eq math{font-family:"STIX Two Math","Cambria Math","Latin Modern Math",math,serif;font-size:1.15em;text-align:left;margin:0}
+.eqn{flex:none;color:var(--muted);font:13px var(--f-mono)}
+#calcNote{margin-top:0}
+.lit{max-width:900px}
+.origin{display:flex;gap:16px;align-items:flex-start;background:color-mix(in srgb,var(--accent) 9%,var(--panel));border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:12px 0 8px;max-width:78ch;--logo-tile:#3a4240;--logo-glass:#eef1ef;--logo-tar:#101312}
+.origin b{font-family:var(--f-display);font-size:20px}
+.origin p{margin:6px 0 0}
+.lit h3{margin:22px 0 8px;font-size:16px}
+.lit .lead{max-width:70ch;color:var(--muted);margin:8px 0 0}
+.refs{margin:0;padding-left:34px;display:grid;gap:8px;max-width:78ch}
+.refs li{padding-left:4px}
+.refs li::marker{content:"[" counter(list-item) "]  ";font-family:var(--f-mono);color:var(--muted);font-size:13px}
+.refs a,.lit a{color:var(--base);word-break:break-word}
+.meth{margin:0;padding-left:20px;display:grid;gap:6px;max-width:78ch}
+.vs{display:inline-block;white-space:nowrap;font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px}
+.vs.ok{background:var(--ok-bg);color:var(--ok)}.vs.no{background:var(--warn-bg);color:var(--accent-ink)}.vs.pr{background:var(--base-bg);color:var(--base)}
+.xfer{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:8px}
+.xfer b{font-size:14px}
+.deskinfo{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-top:12px;padding:10px 12px;border:1px dashed var(--line);border-radius:8px;font-size:13px;color:var(--muted)}
+.deskinfo code{font-family:var(--f-mono);color:var(--ink);word-break:break-all}
+.ver{position:fixed;right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:20;font:500 11px var(--f-mono);color:var(--muted);background:color-mix(in srgb,var(--panel) 85%,transparent);border:1px solid var(--line);border-radius:6px;padding:2px 8px;pointer-events:none}
+.warnbox{background:var(--warn-bg);border-left:4px solid var(--accent);border-radius:6px;padding:12px 14px;margin:10px 0;font-size:14px}
+.warnbox p{margin:6px 0 10px}
+.failbox{background:var(--bad-bg);border-radius:6px;padding:12px;margin-top:8px}
+.samplebar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;border-left:4px solid var(--accent);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.samplebar .who{font-family:var(--f-display);font-size:22px;font-weight:700}
+.samplebar .meta{font-size:13px;color:var(--muted)}
+/* formularz próbki */
+.panel{border:1px dashed var(--line);border-radius:8px;padding:14px;margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chips button{font:500 13px var(--f-body);background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:4px 10px;cursor:pointer}
+.chips button:hover{border-color:var(--accent)}
+.chips button .x{color:var(--muted);margin-left:6px}
+.inline{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.inline .field{flex:1 1 180px}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:500}
+.cmpchips{display:flex;flex-wrap:wrap;gap:8px}
+.cmpchips label{display:flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:99px;padding:5px 12px;text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink);cursor:pointer;background:var(--bg)}
+/* okno dodawania próbki */
+dialog{overflow:visible;border:0;border-radius:12px;padding:0;background:var(--panel);color:var(--ink);width:min(700px,calc(100vw - 24px));max-height:calc(100dvh - 24px);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(12,15,14,.6)}
+#dlgForm{display:flex;flex-direction:column;max-height:calc(100dvh - 24px);border-radius:12px;overflow:hidden}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 20px;background:var(--asphalt);color:#f1f3f2}
+.dlg-head h2{font-size:26px;margin:0}
+.dlg-x{background:transparent;border:0;color:#c8d0cc;font-size:28px;line-height:1;cursor:pointer;padding:0 4px}
+.dlg-body{padding:18px 20px;overflow-y:auto;display:grid;gap:16px}
+.dlg-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--line);background:var(--panel)}
+.dlg-foot .note{flex:1 1 200px}
+.dsec{display:grid;gap:10px}
+.dsec>.lbl{color:var(--accent-ink);font-family:var(--f-mono);letter-spacing:.06em}
+.dsec.basebox{border:1px solid var(--base);border-radius:8px;padding:14px;background:color-mix(in srgb,var(--base-bg) 55%,var(--panel))}
+.dsec.basebox>.lbl{color:var(--base)}
+.dsec .row{margin:0}
+.req7{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:10px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.seg{grid-template-columns:1fr}}
+.seg label{display:flex;flex-direction:column;gap:2px;border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink);background:var(--bg)}
+.seg label.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--panel))}
+.seg label:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg b{font-size:15px}.seg span{font-size:13px;color:var(--muted)}
+.sheet{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.metat th{width:150px;background:var(--bg);text-transform:uppercase;font-size:11px;letter-spacing:.06em;color:var(--muted);vertical-align:middle}
+.metat td{font-weight:500}
+.metat tr:last-child th,.metat tr:last-child td{border-bottom:2px solid var(--line)}
+.rest thead th{background:var(--bg)}
+.rest tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--bg) 40%,var(--panel))}
+.rest tbody tr:last-child td{border-bottom:0}
+.rest td.bad{color:var(--bad)}
+.qnorm{display:grid;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.qnorm>.lbl{color:var(--accent-ink)}
+.qgroup .chips button{font-family:var(--f-mono);background:var(--panel)}
+.cellsel{padding:5px 8px;font-size:13px;min-width:120px;font-family:var(--f-body)}
+.quick{background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:12px 14px;margin:6px 0 14px}
+.qrow{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:flex-end;margin-top:8px}
+.qrow input,.qrow select{background:var(--panel)}
+.qbase{padding-bottom:9px;white-space:nowrap}
+.concl{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:8px}
+.concl li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start;font-size:14.5px;line-height:1.45;padding:9px 12px;border-radius:6px;background:var(--bg)}
+.concl li::before{content:"i";display:grid;place-items:center;width:20px;height:20px;border-radius:50%;font:600 12px var(--f-mono);background:var(--line);color:var(--ink)}
+.concl li.ok::before{content:"✓";background:var(--ok-bg);color:var(--ok)}
+.concl li.bad::before{content:"!";background:var(--bad-bg);color:var(--bad)}
+.concl li.base::before{content:"Δ";background:var(--base-bg);color:var(--base)}
+.concl li.verdict{font-weight:600;background:color-mix(in srgb,var(--accent) 12%,var(--panel))}
+.concl li.verdict::before{content:"★";background:var(--accent);color:#231a00}
+.comprows{display:grid;gap:8px}
+.cbox{position:relative;min-width:0}
+.cbox input{padding-right:34px}
+.cbtn{position:absolute;right:3px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:14px;padding:5px 9px;border-radius:4px}
+.cbtn:hover{color:var(--ink)}
+.clist{position:absolute;z-index:30;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.28);max-height:250px;overflow-y:auto;padding:4px}
+.copt{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 10px;border-radius:5px;cursor:pointer;font-size:14px}
+.copt:hover,.copt.hi{background:var(--bg)}
+.copt.empty{color:var(--muted);cursor:default}
+.copt.conf{background:var(--bad-bg);cursor:default;flex-wrap:wrap}
+.copt.conf .sec{padding:4px 10px}
+.owntag{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-ink);background:var(--warn-bg);border-radius:4px;padding:1px 6px;margin-left:8px}
+.cx{border:0;background:transparent;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:2px 7px;border-radius:4px}
+.cx:hover{color:var(--bad);background:var(--bad-bg)}
+.crow{display:grid;grid-template-columns:minmax(0,1fr) 104px 92px 38px;gap:8px;align-items:center}
+@media (max-width:520px){.crow{grid-template-columns:minmax(0,1fr) 78px 70px 34px;gap:6px}}
+.munit{display:flex;align-items:center;gap:4px}
+.munit select{width:auto;padding:1px 4px;font:600 11px var(--f-body);border-radius:4px}
+.pauto{border-style:dashed}
+.chead{margin-bottom:-4px}
+.crm{height:38px;font-size:18px;line-height:1;padding:0}
+.dlg-msg{background:var(--warn-bg);border-radius:6px;padding:8px 12px;font-size:14px}
+/* wykresy */
+.chart{margin-top:14px}
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .ax{stroke:var(--line);stroke-width:1}
+.chart text{fill:var(--muted);font:11px var(--f-mono)}
+.chart .lbltxt{fill:var(--ink);font:12px var(--f-body)}
+.chart .lineF{fill:none;stroke:var(--accent);stroke-width:2}
+.chart .lineA{fill:none;stroke:var(--muted);stroke-width:1.5;opacity:.6}
+.chart .zone{fill:var(--accent);opacity:.14}
+.chart .band{fill:var(--ok);opacity:.16}
+.chart .bandBad{fill:var(--bad);opacity:.14}
+.chart .dot{fill:var(--ink)}
+.chart .mean{stroke:var(--accent);stroke-width:2}
+.chart .mark{fill:var(--accent);stroke:var(--panel);stroke-width:2}
+.chart .bmark{fill:var(--base);stroke:var(--panel);stroke-width:2}
+.chart .bar{opacity:1}
+.cmpplus{display:grid;gap:14px}
+.cmpgrid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:20px}
+.cmpgrid2 .wide{grid-column:1/-1}
+.cmpgrid2 .wide .chart{max-width:820px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin-bottom:6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.cmpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:20px}
+.cmpgrid h3{font-size:17px}
+.cmpbar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between}
+.chartcard{position:relative}
+.chartcopy{position:absolute;top:12px;right:12px;font-size:12px!important;padding:4px 9px!important}
+.chartcard>h3{padding-right:110px}
+pre.out{font:13px/1.5 var(--f-mono);white-space:pre-wrap;background:var(--bg);border-radius:6px;padding:12px;margin:10px 0 0;max-height:320px;overflow:auto}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="pvTile" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#454e4b"/><stop offset="1" stop-color="#2f3634"/></linearGradient>
+    <linearGradient id="pvTar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d2221"/><stop offset="1" stop-color="#0b0d0c"/></linearGradient>
+    <linearGradient id="pvGlass" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff" stop-opacity=".10"/><stop offset=".45" stop-color="#ffffff" stop-opacity=".02"/><stop offset="1" stop-color="#ffffff" stop-opacity=".07"/></linearGradient>
+    <clipPath id="pvInside"><path d="M222 96h68v118l100 184c11 20-3 44-26 44H148c-23 0-37-24-26-44l100-184z"/></clipPath>
+  </defs>
+  <!-- kolba z asfaltem i białym pasem oznakowania poziomego -->
+  <symbol id="logo" viewBox="0 0 512 512">
+  
+  <rect width="512" height="512" rx="112" fill="url(#pvTile)"/>
+  <rect x="6" y="6" width="500" height="500" rx="106" fill="none" stroke="#ffffff" stroke-opacity=".06" stroke-width="4"/>
+  <g clip-path="url(#pvInside)">
+    <rect x="60" y="60" width="392" height="400" fill="url(#pvGlass)"/>
+    <path d="M60 282c40-18 78 18 118 0s78 18 118 0 78 18 118 0 38 6 38 6V470H60z" fill="url(#pvTar)"/>
+    <line x1="112" y1="366" x2="420" y2="366" stroke="#ffffff" stroke-width="22" stroke-dasharray="50 30" stroke-dashoffset="8"/>
+  </g>
+  <path d="M200 82h112M222 86v128L122 398c-11 20 3 44 26 44h216c23 0 37-24 26-44L290 214V86" fill="none" stroke="#f3f5f4" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M244 112v92" stroke="#ffffff" stroke-opacity=".35" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="292" cy="248" r="17" fill="#f0b726"/>
+  <circle cx="250" cy="192" r="11" fill="#f0b726" opacity=".8"/>
+  <circle cx="276" cy="150" r="7" fill="#f0b726" opacity=".55"/>
+</symbol>
+</svg>
+
+<header>
+  <div class="wrap hrow">
+    <div class="brand"><svg class="logo" width="34" height="34" role="img" aria-label="Logo PaviaLAB"><use href="#logo"/></svg><span class="name">Pavia<span class="lab">LAB</span></span></div>
+    <nav id="nav" aria-label="Widoki">
+      <button data-v="start">Start</button>
+      <button data-v="tests">Badania</button>
+      <button data-v="compare">Porównanie</button>
+      <button data-v="notes">Notes</button>
+      <button data-v="calc">Kalkulator</button>
+      <button data-v="cnote">Notka obliczeniowa</button>
+      <button data-v="lit">Literatura</button>
+    </nav>
+  </div>
+</header>
+
+<main><div class="wrap">
+
+<!-- START -->
+<section class="view" id="v-start">
+  <div class="card hero">
+    <div class="herohead">
+      <svg class="logo" width="104" height="104" aria-hidden="true"><use href="#logo"/></svg>
+      <div><h1 class="wordmark" aria-label="PaviaLAB">Pavia<span class="lab">LAB</span></h1><div class="sub">Badania lepiszczy asfaltowych · PN-EN</div></div>
+    </div>
+    <p>Wpisujesz odczyty z aparatu, a program liczy wyniki według PN-EN, porównuje je z wymaganiami i z próbką bazową.</p>
+    <ol class="steps"><li><b>1</b>Dane próbki</li><li><b>2</b>Próbka bazowa</li><li><b>3</b>Badania</li><li><b>4</b>Porównanie</li></ol>
+    <div class="btns herobtns"><button class="pri" id="startBtn">START</button><button class="sec" data-new id="heroNew" hidden>+ Nowa próbka</button></div>
+    <p class="note" id="startHint" style="margin:0;color:#aab4b0"></p>
+  </div>
+  <div class="card">
+    <div class="btns" style="justify-content:space-between;margin-bottom:8px"><h2>Zapisane próbki</h2><div class="btns"><button class="pri" data-new style="padding:7px 14px;font-size:14px">+ Nowa próbka</button><button class="sec" data-go="compare">Porównaj próbki</button></div></div>
+    <div class="quick" id="quickAdd"></div>
+    <div class="tbl"><table><thead><tr><th>Nazwa próbki</th><th>Bazowa?</th><th>Porównywana z</th><th>Badania</th><th></th></tr></thead><tbody id="sampleList"></tbody></table></div>
+    <p class="note" id="listNote"></p>
+    <div class="deskinfo" id="deskInfo" hidden></div>
+    <div class="xfer">
+      <div><b>Przenoszenie danych</b><span class="note" style="margin:0;display:block">Zapisz wszystkie próbki, notatki i składniki do pliku albo wczytaj je z pliku, np. między telefonem a komputerem.</span></div>
+      <div class="btns"><button class="sec" id="expBtn">Eksportuj dane</button><button class="sec" id="impBtn">Importuj dane</button><input type="file" id="impFile" accept=".json,application/json" hidden></div>
+      <p class="note" id="xferMsg" style="margin:0;flex-basis:100%"></p>
+    </div>
+  </div>
+</section>
+
+<dialog id="sampleDlg" aria-labelledby="dlgTitle">
+  <form method="dialog" id="dlgForm" novalidate>
+    <div class="dlg-head"><h2 id="dlgTitle">Nowa próbka</h2><button type="button" class="dlg-x" id="dlgX" aria-label="Zamknij">×</button></div>
+    <div class="dlg-body" id="dlgBody"></div>
+    <div class="dlg-foot"><span class="note" id="dlgErr" style="margin:0;color:var(--bad)"></span><button type="button" class="sec" id="dlgCancel">Anuluj</button><button type="submit" class="pri" id="dlgSave">Zapisz</button></div>
+  </form>
+  <div class="clist" id="cbList" role="listbox" hidden></div>
+</dialog>
+
+<!-- BADANIA -->
+<section class="view" id="v-tests" hidden>
+  <div class="card samplebar" id="sampleBar"></div>
+
+  <div class="card tblock" data-t="pen">
+    <div class="thead"><div><h2>Penetracja <span class="help" data-help="pen"><button type="button" class="helpbtn" aria-label="Jak wykonać badanie: Penetracja" aria-describedby="tip-pen">?</button><span class="tip" role="tooltip" id="tip-pen"></span></span></h2><div class="norm">PN-EN 1426 · 25 °C · 100 g · 5 s</div></div><div class="status" id="st-pen"></div></div>
+    <div class="tbody"><div class="tin" id="in-pen"></div><div class="tout" id="out-pen"></div></div>
+  </div>
+  <div class="card tblock" data-t="pik">
+    <div class="thead"><div><h2>Temperatura mięknienia PiK <span class="help" data-help="pik"><button type="button" class="helpbtn" aria-label="Jak wykonać badanie: Temperatura mięknienia PiK" aria-describedby="tip-pik">?</button><span class="tip" role="tooltip" id="tip-pik"></span></span></h2><div class="norm">PN-EN 1427 · pierścień i kula</div></div><div class="status" id="st-pik"></div></div>
+    <div class="tbody"><div class="tin" id="in-pik"></div><div class="tout" id="out-pik"></div></div>
+  </div>
+  <div class="card tblock" data-t="ner">
+    <div class="thead"><div><h2>Nawrót sprężysty <span class="help" data-help="ner"><button type="button" class="helpbtn" aria-label="Jak wykonać badanie: Nawrót sprężysty" aria-describedby="tip-ner">?</button><span class="tip" role="tooltip" id="tip-ner"></span></span></h2><div class="norm">PN-EN 13398 · duktylometr</div></div><div class="status" id="st-ner"></div></div>
+    <div class="tbody"><div class="tin" id="in-ner"></div><div class="tout" id="out-ner"></div></div>
+  </div>
+  <div class="card tblock" data-t="en">
+    <div class="thead"><div><h2>Energia odkształcenia <span class="help" data-help="en"><button type="button" class="helpbtn" aria-label="Jak wykonać badanie: Energia odkształcenia" aria-describedby="tip-en">?</button><span class="tip" role="tooltip" id="tip-en"></span></span></h2><div class="norm">PN-EN 13589 · próba siły rozciągania</div></div><div class="status" id="st-en"></div></div>
+    <div class="tbody"><div class="tin" id="in-en"></div><div class="tout" id="out-en"></div></div>
+  </div>
+  <div class="card tblock" data-t="lep">
+    <div class="thead"><div><h2>Lepkość <span class="help" data-help="lep"><button type="button" class="helpbtn" aria-label="Jak wykonać badanie: Lepkość" aria-describedby="tip-lep">?</button><span class="tip" role="tooltip" id="tip-lep"></span></span></h2><div class="norm" id="lepNorm"></div></div><div class="status" id="st-lep"></div></div>
+    <div class="tbody"><div class="tin" id="in-lep"></div><div class="tout" id="out-lep"></div></div>
+  </div>
+
+  <div class="card">
+    <h2>Podsumowanie próbki</h2><div class="norm" style="margin-bottom:12px">Wnioski, wyniki, wymagania i różnice względem próbki bazowej</div>
+    <h3>Wnioski</h3><ul class="concl" id="concl"></ul>
+    <h3>Zestawienie</h3>
+    <div class="sheet" id="sumSheet">
+      <div class="tbl"><table class="metat"><tbody id="sumMeta"></tbody></table></div>
+      <div class="tbl"><table class="rest"><thead id="sumH"></thead><tbody id="sumB"></tbody></table></div>
+    </div>
+    <div class="btns" style="margin-top:14px"><button class="pri" id="copyBtn">Kopiuj zestawienie</button><button class="sec" data-go="compare">Porównaj z innymi próbkami</button><span class="note" id="copyMsg" style="margin:0"></span></div>
+    <h3 style="margin-top:22px">Wyniki na wykresie</h3>
+    <div class="chart" id="sumChart" style="margin-top:4px;max-width:560px"></div>
+  </div>
+</section>
+
+<!-- NOTES -->
+<section class="view" id="v-notes" hidden>
+  <div class="notes-wrap">
+    <div class="card notes-list"><div class="btns" style="justify-content:space-between;margin-bottom:10px"><h2>Notes</h2><button class="pri" id="noteNew" style="padding:7px 14px;font-size:14px">+ Nowa notatka</button></div>
+      <input id="noteSearch" type="search" placeholder="Szukaj w notatkach" aria-label="Szukaj w notatkach" style="margin-bottom:10px;font-family:var(--f-body)">
+      <div id="noteList"></div></div>
+    <div class="card" id="noteEd"></div>
+  </div>
+</section>
+
+<!-- KALKULATOR -->
+<section class="view" id="v-calc" hidden>
+  <div class="calcgrid">
+    <div class="card"><h2>Kalkulator</h2><div class="norm" style="margin-bottom:12px">Wpisz działanie lub użyj przycisków</div>
+      <input id="cDisp" class="cdisp" inputmode="decimal" autocomplete="off" aria-label="Działanie" placeholder="0">
+      <div class="cres" id="cRes" aria-live="polite">&nbsp;</div>
+      <div class="ckeys" id="cKeys"></div>
+      <div class="note" id="cHist" style="margin-top:10px"></div></div>
+    <div class="card"><h2>Dozowanie dodatku</h2><div class="norm" style="margin-bottom:12px">Ile dodatku na daną masę asfaltu</div>
+      <div class="row"><div class="field"><label for="dzMode">Liczę od</label><select id="dzMode" style="font-family:var(--f-body)"><option value="base">masy asfaltu bazowego</option><option value="total">masy całej mieszanki</option></select></div></div>
+      <div class="row"><div class="field"><label for="dzMass" id="dzMassL">Masa asfaltu [g]</label><input id="dzMass" type="number" step="any" inputmode="decimal" value="1000"></div>
+        <div class="field"><label for="dzPct">Udział dodatku w mieszance [%]</label><input id="dzPct" type="number" step="any" inputmode="decimal" value="4.5"></div></div>
+      <dl id="dzOut"></dl>
+      <div class="formula" id="dzF"></div></div>
+    <div class="card"><h2>Przelicznik jednostek</h2><div class="norm" style="margin-bottom:12px">Lepkość i temperatura</div>
+      <div class="row"><div class="field"><label for="uVal">Wartość</label><input id="uVal" type="number" step="any" inputmode="decimal" value="615"></div>
+        <div class="field"><label for="uFrom">Jednostka</label><select id="uFrom" style="font-family:var(--f-body)">
+          <optgroup label="Lepkość dynamiczna"><option value="mPas" selected>mPa·s</option><option value="Pas">Pa·s</option><option value="cP">cP</option><option value="P">P</option></optgroup>
+          <optgroup label="Lepkość kinematyczna"><option value="mm2s">mm²/s</option><option value="cSt">cSt</option><option value="m2s">m²/s</option></optgroup>
+          <optgroup label="Temperatura"><option value="C">°C</option><option value="F">°F</option><option value="K">K</option></optgroup></select></div></div>
+      <dl id="uOut"></dl></div>
+  </div>
+</section>
+
+<!-- NOTKA OBLICZENIOWA -->
+<section class="view" id="v-cnote" hidden>
+  <div class="card" id="calcNote">
+    <div class="btns" style="justify-content:space-between;margin-bottom:6px"><div><h2>Notka obliczeniowa</h2><div class="norm">Jak policzono wyniki próbki, krok po kroku</div></div>
+      <div class="btns"><select id="cnSample" aria-label="Próbka do notki" style="width:auto;font-family:var(--f-body)"></select><button class="pri" id="cnCopy" style="padding:8px 14px;font-size:14px">Kopiuj notkę</button></div></div>
+    <span class="note" id="cnMsg" style="margin:0"></span>
+    <div id="cnBody"></div>
+  </div>
+</section>
+
+<!-- LITERATURA -->
+<section class="view" id="v-lit" hidden>
+  <div class="card lit">
+    <h2>Literatura i podstawy programu</h2><div class="norm" style="margin-bottom:6px">Normy, źródła i metody, na których oparto obliczenia PaviaLAB</div>
+    <div class="origin"><svg class="logo" width="56" height="56" aria-hidden="true"><use href="#logo"/></svg><div>
+      <b>Skąd nazwa PaviaLAB?</b>
+      <p>Nazwa łączy trzy słowa, które opisują, czym zajmuje się program. <i>Pavement</i> (ang. nawierzchnia) przypomina, że każde badanie lepiszcza służy ostatecznie trwałej i bezpiecznej nawierzchni. <i>Via</i> (łac. droga) to droga w dosłownym sensie, ta, po której jeździmy, i w przenośni, metodyczna ścieżka od próbki do wyniku. <i>LAB</i> to laboratorium, miejsce, w którym precyzja pomiaru i rzetelność obliczeń zamieniają się w wiedzę o materiale.</p>
+      <p>Razem PaviaLAB znaczy: laboratorium drogi i nawierzchni. Kolba z asfaltem przeciętym białą linią oznakowania poziomego łączy w znaku laboratoryjną staranność z drogowym przeznaczeniem badań.</p></div></div>
+    <p class="lead">Program jest narzędziem pomocniczym do obliczeń laboratoryjnych. Wiążący jest zawsze pełny tekst aktualnej normy, którą dysponuje laboratorium. Numery w nawiasach kwadratowych odsyłają do pozycji poniżej.</p>
+
+    <h3>1. Normy badań</h3>
+    <ol class="refs">
+      <li id="r1"><b>PN-EN 1426</b> Asfalty i lepiszcza asfaltowe – Oznaczanie penetracji igłą. Wydanie EN 1426:2015, nowsze wydanie EN 1426:2024.</li>
+      <li id="r2"><b>PN-EN 1427</b> Asfalty i lepiszcza asfaltowe – Oznaczanie temperatury mięknienia – Metoda Pierścień i Kula.</li>
+      <li id="r3"><b>PN-EN 13398</b> Asfalty i lepiszcza asfaltowe – Oznaczanie nawrotu sprężystego asfaltów modyfikowanych. Wydanie EN 13398:2017.</li>
+      <li id="r4"><b>PN-EN 13589</b> Asfalty i lepiszcza asfaltowe – Oznaczanie właściwości rozciągania asfaltów modyfikowanych metodą duktylometryczną z pomiarem siły. Wydania 2008 i 2018.</li>
+      <li id="r5"><b>PN-EN 13703</b> Asfalty i lepiszcza asfaltowe – Oznaczanie energii odkształcenia. Norma wycofana, jej zakres przejęły PN-EN 13589 i PN-EN 13587.</li>
+      <li id="r6"><b>PN-EN 13302</b> Asfalty i lepiszcza asfaltowe – Oznaczanie lepkości dynamicznej wiskozymetrem z obrotowym wrzecionem.</li>
+      <li id="r7"><b>PN-EN 12596</b> Asfalty i lepiszcza asfaltowe – Oznaczanie lepkości dynamicznej metodą kapilary próżniowej.</li>
+      <li id="r8"><b>PN-EN 12595</b> Asfalty i lepiszcza asfaltowe – Oznaczanie lepkości kinematycznej.</li>
+      <li id="r9"><b>PN-EN 12594</b> Asfalty i lepiszcza asfaltowe – Przygotowanie próbek do badań.</li>
+    </ol>
+
+    <h3>2. Normy wyrobów (wymagania)</h3>
+    <ol class="refs" start="10">
+      <li id="r10"><b>PN-EN 12591</b> Asfalty i lepiszcza asfaltowe – Wymagania dla asfaltów drogowych. Wydanie EN 12591:2009, załącznik A: indeks penetracji.</li>
+      <li id="r11"><b>PN-EN 14023</b> Asfalty i lepiszcza asfaltowe – Ramowe wymagania dla asfaltów modyfikowanych polimerami.</li>
+    </ol>
+
+    <h3>3. Literatura i źródła pomocnicze</h3>
+    <ol class="refs" start="12">
+      <li id="r12">Pfeiffer J.Ph., Van Doormaal P.M., <i>The rheological properties of asphaltic bitumens</i>, Journal of the Institute of Petroleum Technologists, 22, 1936. Pochodzenie indeksu penetracji PI.</li>
+      <li id="r13">Eurobitume, <i>Technical Information: Force Ductility</i>, 2024. <a href="https://eurobitume.eu/wp-content/uploads/2024/06/EB-Technical-Information-Force-Ductility-English.pdf" target="_blank" rel="noopener">eurobitume.eu</a></li>
+      <li id="r14">Bohinc i in., <i>Determining the elongation energy of PmB at various extension lengths</i>, 2018. <a href="https://zenodo.org/record/1456405" target="_blank" rel="noopener">zenodo.org/record/1456405</a></li>
+      <li id="r15">University of Antwerp, karty procedur: <i>Determination of needle penetration – EN 1426</i> oraz <i>EN 1427: Determination of softening point</i>. <a href="https://medialibrary.uantwerpen.be/files/123208/04d46df9-8109-41c1-8d32-ee9723564720.pdf" target="_blank" rel="noopener">EN 1426</a> · <a href="https://medialibrary.uantwerpen.be/files/123208/0b1ac11d-3c07-4076-a1cf-c1f69f693702.pdf" target="_blank" rel="noopener">EN 1427</a></li>
+      <li id="r16">Podglądy norm: SIST EN 13398:2018, SIST EN 13589:2008, SIST EN 13703:2004, SIST EN 1426:2015. <a href="https://cdn.standards.iteh.ai/samples/60789/fd6e16333c324c5b815064d3998fe0b1/SIST-EN-13398-2018.pdf" target="_blank" rel="noopener">EN 13398</a> · <a href="https://cdn.standards.iteh.ai/samples/28891/0de4a95a0c59497cad402a36f4bcb651/SIST-EN-13589-2008.pdf" target="_blank" rel="noopener">EN 13589</a> · <a href="https://www.scribd.com/document/702904787/SIST-EN-13703-2004" target="_blank" rel="noopener">EN 13703</a> · <a href="https://cdn.standards.iteh.ai/samples/37703/a3746101e5ba476fb1f6738b21ea9c28/SIST-EN-1426-2015.pdf" target="_blank" rel="noopener">EN 1426</a></li>
+      <li id="r17">Karty techniczne producentów: ORLEN, asfalt drogowy 50/70; ExxonMobil, Paving Bitumen CH; Ferrovial, deklaracja właściwości użytkowych PMB 45/80-65. <a href="https://orlen.pl/en/for-business/products/bitumens/paving-grade-bitumens/paving-grade-bitumen-50-70" target="_blank" rel="noopener">ORLEN</a> · <a href="https://www.mobil.com/en-ch/Asphalt/pds/eu-ch-Paving-Bitumen-CH-Series" target="_blank" rel="noopener">Mobil</a> · <a href="https://static.ferrovial.com/wp-content/uploads/2020/08/13124107/declaracion-de-prestaciones-pmb-45-80_65-en_3.pdf" target="_blank" rel="noopener">Ferrovial</a></li>
+    </ol>
+
+    <h3>4. Metody obliczeniowe programu</h3>
+    <ul class="meth">
+      <li><b>Penetracja</b> [1]: średnia arytmetyczna z co najmniej 3 oznaczeń, kontrola rozstępu (2 / 4 / 6 / 8 ×0,1 mm), zaokrąglenie do liczby całkowitej.</li>
+      <li><b>Temperatura mięknienia</b> [2]: średnia z dwóch kulek, dopuszczalna różnica 1 °C (poniżej 80 °C) lub 2 °C (od 80 °C), zaokrąglenie do 0,2 °C lub 0,5 °C.</li>
+      <li><b>Nawrót sprężysty</b> [3]: R<sub>E</sub> = d / L · 100 %, średnia z kształtek, zaokrąglenie do 1 %.</li>
+      <li><b>Energia odkształcenia</b> [4, 5, 13]: całkowanie krzywej siła–wydłużenie metodą trapezów, wartości w 200 i 400 mm interpolowane liniowo, E′ = E / A, E′<sub>s</sub> = E′<sub>0,4</sub> − E′<sub>0,2</sub>; wynik ze średniej 3 ważnych oznaczeń w jednej temperaturze, zaokrąglenie do 0,01 lub 0,1 J/cm².</li>
+      <li><b>Lepkość</b> [6–8]: średnia odczytów (metoda rotacyjna) lub η = K · t, ν = C · t (metody kapilarne), osobno dla każdej temperatury; rozrzut w procentach średniej.</li>
+      <li><b>Indeks penetracji</b> [10, 12]: PI = (20 · T<sub>PiK</sub> + 500 · log P − 1952) / (T<sub>PiK</sub> − 50 · log P + 120).</li>
+      <li><b>Porównanie z próbką bazową</b>: Δ = x − x<sub>b</sub>, δ = Δ / x<sub>b</sub> · 100 %; lepkość porównywana tylko w tej samej temperaturze i jednostce.</li>
+    </ul>
+
+    <h3>5. Stan weryfikacji</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Element programu</th><th>Podstawa</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Rozstęp penetracji 2 / 4 / 6 dla pen do 249</td><td>[1, 15]</td><td><span class="vs ok">potwierdzone</span></td></tr>
+        <tr><td>Rozstęp penetracji 8 dla pen ≥ 250</td><td>[1]</td><td><span class="vs no">do potwierdzenia</span></td></tr>
+        <tr><td>PiK: różnica kulek i zaokrąglenie</td><td>[2, 15]</td><td><span class="vs ok">potwierdzone</span></td></tr>
+        <tr><td>Nawrót: procedura (200 mm, 50 mm/min, 10 s, 30 min)</td><td>[3, 16]</td><td><span class="vs ok">potwierdzone</span></td></tr>
+        <tr><td>Nawrót: wzór i zaokrąglenie wyniku</td><td>[3]</td><td><span class="vs no">do potwierdzenia</span></td></tr>
+        <tr><td>Energia: E′ = E / A, E′s = E′0,4 − E′0,2</td><td>[4, 5, 14]</td><td><span class="vs ok">potwierdzone</span></td></tr>
+        <tr><td>Energia: 5 °C, 50 mm/min, 400 mm, 3 oznaczenia, +5 °C po zerwaniu, zaokrąglenie</td><td>[4, 13, 16]</td><td><span class="vs ok">potwierdzone</span></td></tr>
+        <tr><td>Wymagania 50/70, 70/100, 160/220 (penetracja, PiK, PI od −1,5 do +0,7)</td><td>[10, 17]</td><td><span class="vs ok">potwierdzone</span></td></tr>
+        <tr><td>Wymagania 20/30, 35/50, 100/150 i PMB</td><td>[10, 11]</td><td><span class="vs no">do potwierdzenia</span></td></tr>
+        <tr><td>Wzór indeksu PI</td><td>[10, 12]</td><td><span class="vs no">do potwierdzenia</span></td></tr>
+        <tr><td>Lepkość: kryteria powtarzalności</td><td>[6–8]</td><td><span class="vs no">do potwierdzenia</span></td></tr>
+        <tr><td>Wnioski w podsumowaniu, progi „bez zmian”</td><td>—</td><td><span class="vs pr">praktyka / interpretacja</span></td></tr>
+      </tbody></table></div>
+  </div>
+</section>
+
+<!-- PORÓWNANIE -->
+<section class="view" id="v-compare" hidden>
+  <div class="card">
+    <div class="cmpbar"><div><h2>Porównanie próbek</h2><div class="norm" style="margin-bottom:12px">Zaznacz próbki i wybierz próbkę odniesienia</div></div>
+      <div class="btns"><button class="pri" id="cmpCopyAll" style="padding:9px 16px;font-size:14px">Kopiuj całe porównanie do Worda</button></div></div>
+    <div class="cmpchips" id="cmpChips"></div>
+    <div class="row" style="margin:14px 0 0"><div class="field" style="flex:0 1 320px"><label for="cmpRef">Porównuj względem</label><select id="cmpRef"></select></div></div>
+  </div>
+  <div class="card chartcard" id="cmpTableCard"><button class="sec chartcopy" data-copytable>Kopiuj tabelę</button><h3 style="margin:0 0 10px">Tabela porównawcza</h3><div class="tbl"><table><thead id="cmpH"></thead><tbody id="cmpB"></tbody></table></div><p class="note">Pod wynikiem podana jest różnica Δ względem próbki odniesienia.</p></div>
+  <div class="cmpplus" id="cmpPlus"></div>
+  <h2 style="margin-top:4px">Wyniki poszczególnych badań</h2>
+  <div id="cmpLegend"></div>
+  <div class="cmpgrid" id="cmpCharts"></div>
+</section>
+
+</div></main>
+<div class="ver" aria-label="Wersja programu">PaviaLAB v0.08</div>
+
+<script>
+/* ===== pomocnicze ===== */
+const $=s=>document.querySelector(s);
+const num=v=>{if(v===null||v===undefined)return NaN;const s=String(v).trim().replace(',','.');return s===''?NaN:Number(s)};
+const fmt=(x,d=1)=>typeof x==='number'&&isFinite(x)?x.toFixed(d).replace('.',','):'—';
+const sgn=(x,d)=>(x>0?'+':x<0?'−':'±')+fmt(Math.abs(x),d);
+const mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
+const roundTo=(x,st)=>Math.round(x/st)*st;
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const chip=(ok,t)=>`<span class="chip ${ok===null?'na':ok?'ok':'bad'}">${ok===null?'':ok?'✓ ':'✕ '}${t}</span>`;
+// Wersja na komputer (PaviaLAB.exe) udostępnia /api/data: dane trafiają do pliku w Dokumenty\PaviaLAB. W przeglądarce: localStorage.
+const DESK=(()=>{if(!/^https?:$/.test(location.protocol)||!/^(127\.0\.0\.1|localhost)$/.test(location.hostname))return null;
+  try{const x=new XMLHttpRequest();x.open('GET','/api/data',false);x.send();if(x.status===200){const d=JSON.parse(x.responseText||'{}');return{data:d&&typeof d==='object'?d:{}}}}catch(e){}return null})();
+let deskTimer=null;
+function deskFlush(beacon){if(!DESK)return;clearTimeout(deskTimer);deskTimer=null;const body=JSON.stringify(DESK.data);
+  if(beacon&&navigator.sendBeacon){navigator.sendBeacon('/api/data',new Blob([body],{type:'application/json'}));return}
+  fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json'},body}).catch(()=>{})}
+const store={get(k,d){if(DESK){const v=DESK.data[k];return v===undefined||v===null?d:JSON.parse(JSON.stringify(v))}try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch(e){return d}},
+  set(k,v){if(DESK){DESK.data[k]=JSON.parse(JSON.stringify(v));clearTimeout(deskTimer);deskTimer=setTimeout(deskFlush,400);return}try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+if(DESK){addEventListener('pagehide',()=>{deskFlush(true);navigator.sendBeacon&&navigator.sendBeacon('/api/bye','')});
+  setInterval(()=>fetch('/api/ping',{method:'POST'}).catch(()=>{}),3000);fetch('/api/ping',{method:'POST'}).catch(()=>{});}
+const uid=()=>'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const getPath=(o,p)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
+function setPath(o,p,v){const k=p.split('.');let a=o;for(let i=0;i<k.length-1;i++){if(a[k[i]]==null)a[k[i]]={};a=a[k[i]]}a[k[k.length-1]]=v}
+const KEYS=['pen','pik','ner','en','lep'];
+const NAMES={pen:'Penetracja w 25 °C',pik:'Temperatura mięknienia PiK',ner:'Nawrót sprężysty',en:'Energia odkształcenia E′s',lep:'Lepkość',pi:'Indeks penetracji PI'};
+const DEC={pen:0,pik:1,ner:0,en:2,lep:1,pi:1};
+
+/* ===== gatunki ===== */
+const GRADES=[['20/30',20,30,55,63],['35/50',35,50,50,58],['50/70',50,70,46,54],['70/100',70,100,43,51],['100/150',100,150,39,47],['160/220',160,220,35,43],
+  ['PMB 25/55-60',25,55,60,''],['PMB 45/80-55',45,80,55,''],['PMB 45/80-65',45,80,65,''],['PMB 65/105-60',65,105,60,'']];
+const REQ=['pmin','pmax','kmin','kmax','ner','en','lep'];
+let custom=store.get('asf_grades2',null);
+if(!custom){const old=store.get('asf_grades',[]);custom=old.map(c=>({name:c.name,desc:c.desc||'',req:{pmin:c.req?.rPenMin||'',pmax:c.req?.rPenMax||'',kmin:c.req?.rPikMin||'',kmax:c.req?.rPikMax||'',ner:c.req?.rNerMin||'',en:c.req?.rEnMin||'',lep:c.req?.rLepMin||''}}))}
+const COMP_DEF=['Asfalt drogowy 35/50','Asfalt drogowy 50/70','Asfalt drogowy 70/100','Asfalt drogowy 160/220','SBS (elastomer)','EVA (plastomer)','Miał gumowy','Wosk F-T','Wosk amidowy','Kwas polifosforowy (PPA)','Środek adhezyjny','Olej / rejuwenator','Asfalt naturalny (TLA)','Plastomer PE'];
+let comps=store.get('asf_comp2',null);
+const fixAB=t=>String(t??'').replace(/Asfalt bazowy/g,'Asfalt drogowy').replace(/asfalt bazowy/g,'asfalt drogowy');
+if(comps){comps=[...new Set(comps.map(fixAB))];store.set('asf_comp2',comps)}
+if(!comps){const old=store.get('asf_comp',[]),oldDef=['asfalt drogowy 50/70','asfalt drogowy 70/100','SBS','wosk F-T','środek adhezyjny'];comps=[...COMP_DEF,...old.filter(o=>!oldDef.includes(o))]}
+const gradeName=s=>s.grade?.startsWith('c:')?s.grade.slice(2):(s.grade||'');
+function applyGrade(s){if(s.grade.startsWith('c:')){const c=custom.find(x=>x.name===s.grade.slice(2));if(c){s.req={...c.req};if(c.desc&&!s.desc.trim())s.desc=c.desc}}
+  else{const g=GRADES.find(x=>x[0]===s.grade);if(g){s.req={pmin:g[1],pmax:g[2],kmin:g[3],kmax:g[4],ner:'',en:'',lep:''}}}}
+
+/* ===== próbki ===== */
+function newSample(o={}){return Object.assign({id:uid(),nr:'',code:'',grade:'',desc:'',isBase:false,baseId:'',date:new Date().toISOString().slice(0,10),who:'',
+  req:{pmin:'',pmax:'',kmin:'',kmax:'',ner:'',en:'',lep:''},
+  comps:[],tests:{pen:{st:'ok',why:'',reads:['','','','']},pik:{st:'ok',why:'',a:'',b:'',med:'w'},ner:{st:'ok',why:'',T:'25',L:'200',reads:['','']},
+    en:{st:'ok',why:'',A:'1',specs:[{T:'5',txt:''},{T:'5',txt:''},{T:'5',txt:''}]},lep:{st:'ok',why:'',m:'rot',sets:[newLepSet('135')]}}},o)}
+function newLepSet(T='',K=''){return{T,reads:[''],cap:[[K,''],[K,'']]}}
+function normEn(t){if(!t.specs){const n=+t.n||3,T=t.T||'5';t.specs=(t.txts||[]).slice(0,n).map(x=>({T,txt:x}));while(t.specs.length<n)t.specs.push({T,txt:''});delete t.txts;delete t.n;delete t.T}}
+function normLep(t){if(!t.sets){t.sets=[{T:t.T||'135',reads:t.reads||[''],cap:t.cap||[['',''],['','']]}];delete t.T;delete t.reads;delete t.cap}}
+let samples=store.get('asf_samples',null),cur=null,view='start';
+if(samples)samples.forEach(x=>{normLep(x.tests.lep);normEn(x.tests.en);x.desc=fixAB(x.desc);(x.comps||[]).forEach(c=>c.n=fixAB(c.n))});
+const byId=id=>samples.find(s=>s.id===id);
+const label=s=>s?(s.nr||'bez numeru'):'';
+function save(){store.set('asf_samples',samples)}
+
+/* ===== obliczenia ===== */
+const empty=t=>({html:`<div class="lbl">Wynik</div><div class="big">—</div><p class="note">${t}</p>`});
+function penLimit(p){return p<=49?2:p<=149?4:p<=249?6:8}
+function calcPen(t){const v=t.reads.map(num).filter(isFinite);if(v.length<3)return empty('Wpisz co najmniej trzy oznaczenia.');
+  const m=mean(v),res=Math.round(m),rng=Math.max(...v)-Math.min(...v),lim=penLimit(m),ok=rng<=lim;
+  return{val:res,ok,txt:`${res} ×0,1 mm`,html:`<div class="lbl">Penetracja w 25 °C</div><div class="big">${res}<small>×0,1 mm</small></div>
+  ${chip(ok,ok?'Oznaczenia ważne':'Rozstęp za duży, powtórz badanie')}
+  <dl><dt>Średnia</dt><dd>${fmt(m,2)}</dd><dt>Rozstęp</dt><dd>${fmt(rng,1)}</dd><dt>Dopuszczalny rozstęp</dt><dd>${lim}</dd><dt>Liczba oznaczeń</dt><dd>${v.length}</dd></dl>
+  <div class="chart">${dotPlot(v,m,lim/2,0)}</div>
+  <div class="formula">wynik = średnia zaokrąglona do liczby całkowitej<br>rozstęp ≤ 2 (pen ≤ 49), 4 (50–149), 6 (150–249), 8 (≥ 250)</div>`}}
+function calcPik(t){const a=num(t.a),b=num(t.b);if(!isFinite(a)||!isFinite(b))return empty('Wpisz temperatury obu kulek.');
+  const m=(a+b)/2,hi=m>=80,res=roundTo(m,hi?0.5:0.2),d=Math.abs(a-b),lim=hi?2:1,ok=d<=lim;
+  return{val:res,ok,txt:`${fmt(res,1)} °C`,html:`<div class="lbl">Temperatura mięknienia</div><div class="big">${fmt(res,1)}<small>°C</small></div>
+  ${chip(ok,ok?'Różnica w normie':'Różnica za duża, powtórz badanie')}
+  <dl><dt>Średnia</dt><dd>${fmt(m,2)} °C</dd><dt>Różnica kulek</dt><dd>${fmt(d,1)} °C</dd><dt>Dopuszczalna różnica</dt><dd>${lim} °C</dd><dt>Zaokrąglenie</dt><dd>${hi?'0,5':'0,2'} °C</dd></dl>
+  <div class="chart">${dotPlot([a,b],m,lim/2,1)}</div>
+  ${t.med==='w'&&m>80?'<p class="note">Powyżej 80 °C badanie wykonuje się zwykle w glicerolu. Sprawdź dobór cieczy wg normy.</p>':''}
+  ${t.med==='g'&&m<80?'<p class="note">Przy wyniku poniżej 80 °C w glicerolu sprawdź w normie, czy nie trzeba powtórzyć badania w wodzie.</p>':''}`}}
+function calcNer(t){const v=t.reads.map(num).filter(isFinite),L=num(t.L);if(!v.length||!(L>0))return empty('Wpisz odległości d dla próbek.');
+  const rs=v.map(d=>d/L*100),m=mean(rs),res=Math.round(m);
+  return{val:res,txt:`${res} % (${t.T} °C)`,html:`<div class="lbl">Nawrót sprężysty w ${esc(t.T)} °C</div><div class="big">${res}<small>%</small></div>
+  ${v.length<2?chip(false,'Norma wymaga dwóch próbek'):chip(null,`Średnia z ${v.length} próbek`)}
+  <dl>${rs.map((r,i)=>`<dt>Próbka ${i+1}</dt><dd>${fmt(r,1)} %</dd>`).join('')}<dt>Różnica max</dt><dd>${fmt(Math.max(...rs)-Math.min(...rs),1)} pkt</dd></dl>
+  <div class="chart">${dotPlot(rs,m,null,1)}</div>
+  <div class="formula">R<sub>E</sub> = d / L × 100 %<br>wynik = średnia zaokrąglona do 1 %</div>`}}
+function parsePts(t){const p=String(t||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const s=l.split(/[\t; ]+/).filter(Boolean);
+  return s.length>=2?[num(s[0]),num(s[1])]:null}).filter(x=>x&&isFinite(x[0])&&isFinite(x[1])).sort((a,b)=>a[0]-b[0]);
+  if(p.length&&p[0][0]>0)p.unshift([0,0]);return p}
+function energyTo(p,X){if(!p.length||p[p.length-1][0]<X)return null;let E=0;
+  for(let i=1;i<p.length;i++){const[x0,f0]=p[i-1];let[x1,f1]=p[i];if(x0>=X)break;
+    if(x1>X){f1=f0+(f1-f0)*(X-x0)/(x1-x0);x1=X}E+=(f0+f1)/2*(x1-x0)}return E/1000} // N·mm → J
+function calcEn(t){normEn(t);const A=num(t.A);
+  const rows=t.specs.map((sp,i)=>{const p=parsePts(sp.txt);if(p.length<3)return{i,T:sp.T,empty:true};const e2=energyTo(p,200),e4=energyTo(p,400);
+    return{i,T:sp.T,p,e2:e2!==null?e2/A:null,e4:e4!==null?e4/A:null,mx:p[p.length-1][0],ok:e4!==null}});
+  const used=rows.filter(r=>!r.empty),temps=[...new Set(used.map(r=>num(r.T)))].filter(isFinite).sort((a,b)=>a-b);
+  const groups=temps.map(T=>({T,full:used.filter(r=>num(r.T)===T&&r.ok),lost:used.filter(r=>num(r.T)===T&&!r.ok)}));
+  // PN-EN 13589: wynik = średnia z 3 ważnych oznaczeń w jednej temperaturze; kruche zerwanie → powtórzyć; drugie zerwanie → temperatura +5 °C
+  const main=groups.find(g=>g.full.length>=3)||groups.filter(g=>g.full.length).sort((a,b)=>b.full.length-a.full.length||a.T-b.T)[0];
+  const lostAll=used.filter(r=>!r.ok),last=groups[groups.length-1],okN=main?main.full.length:0,complete=okN>=3;
+  const curves=curveChart(used.map(r=>r.p)),nr=r=>r.i+1,list=a=>a.map(nr).join(', '),T0=x=>fmt(x,x%1?1:0);
+  const rnd=v=>v<1?Math.round(v*100)/100:Math.round(v*10)/10,dec=v=>v<1?2:1;
+  let warn='';
+  if(lostAll.length||(main&&!complete)){const lines=groups.filter(g=>g.lost.length).map(g=>`${T0(g.T)} °C: ${g.lost.map(r=>`kształtka ${nr(r)} zerwana przy ${fmt(r.mx,0)} mm`).join(', ')}`).join('<br>');
+    let act='';const g=last;
+    if(g&&g.full.length<3&&g.lost.length>=2){const nT=g.T+5;act=`<p>W ${T0(g.T)} °C zerwały się co najmniej dwie kształtki. Według PN-EN 13589 po ponownym kruchym zerwaniu temperaturę badania podnosi się o 5 °C. Zbadaj 3 nowe kształtki w ${T0(nT)} °C. Dotychczasowe odczyty zostają zapisane.</p>
+      <button type="button" class="sec" data-enadd="${nT}:3">+ Dodaj 3 kształtki w ${T0(nT)} °C</button>`}
+    else if(g&&g.full.length<3){const need=3-g.full.length;act=`<p>${g.lost.length?`Po kruchym zerwaniu badanie powtarza się na nowej kształtce w tej samej temperaturze. `:''}Do wyniku potrzebne są 3 ważne oznaczenia w jednej temperaturze, w ${T0(g.T)} °C ${g.full.length===1?'jest 1':'są '+g.full.length}.</p>
+      <button type="button" class="sec" data-enadd="${g.T}:${need}">+ Dodaj ${need===1?'kształtkę':need+' kształtki'} w ${T0(g.T)} °C</button>`}
+    warn=`<div class="warnbox">${lostAll.length?`<b>${lostAll.length===1?'1 kształtka stracona':lostAll.length+(lostAll.length<5?' kształtki stracone':' kształtek straconych')}: kruche zerwanie przed 400 mm</b><p>${lines}</p>`:'<b>Za mało ważnych oznaczeń</b>'}${act}</div>`}
+  const tbl=`<div class="tbl" style="margin-top:12px"><table><thead><tr><th>Kształtka</th><th>Temp.</th><th>E′0,2</th><th>E′0,4</th><th>E′s</th></tr></thead><tbody>`+
+    rows.map(r=>r.empty?`<tr><td>${nr(r)}</td><td class="num">${esc(r.T)} °C</td><td colspan="3" class="note" style="margin:0">brak danych</td></tr>`:
+    `<tr${r.ok?'':' class="lostrow"'}><td>${nr(r)}</td><td class="num">${esc(r.T)} °C</td><td class="num">${fmt(r.e2,3)}</td><td class="num">${r.ok?fmt(r.e4,3):`<span class="lost">stracona · ${fmt(r.mx,0)} mm</span>`}</td><td class="num">${r.ok?fmt(r.e4-r.e2,3):'—'}</td></tr>`).join('')+`</tbody></table></div>`;
+  const form=`<div class="formula">E = ∫ F dx (metoda trapezów), E′ = E / przekrój<br>E′s = E′0,4 − E′0,2 (energia między 200 a 400 mm)<br>wynik: średnia z 3 ważnych oznaczeń, zaokrąglenie do 0,01 J/cm² (&lt; 1) lub 0,1 J/cm² (≥ 1)</div>`;
+  const curve=(main?main.full[0]:used[0])?.p||null,lostL=lostAll.map(r=>({n:nr(r),T:r.T,mx:r.mx}));
+  if(!main)return{curve,html:`<div class="lbl">Wynik</div><div class="big">—</div>${warn||'<p class="note">Wklej pary wydłużenie–siła dla 3 kształtek, sięgające 400 mm.</p>'}${curves}${tbl}${form}`,broken:lostAll.length,lost:lostL};
+  const es=mean(main.full.map(r=>r.e4-r.e2)),esR=rnd(es),other=groups.filter(g=>g!==main&&g.full.length);
+  return{curve,val:esR,T:main.T,ok:complete?undefined:false,incomplete:!complete,txt:`${fmt(esR,dec(esR))} J/cm² (${T0(main.T)} °C)`,broken:lostAll.length,lost:lostL,usedN:okN,
+    html:`<div class="lbl">Energia umowna E′s w ${T0(main.T)} °C</div><div class="big">${fmt(esR,dec(esR))}<small>J/cm²</small></div>
+  ${complete?chip(true,`Średnia z ${okN} ważnych oznaczeń (kształtki ${list(main.full)})`):chip(false,`Wynik wstępny: ${okN} z 3 wymaganych ważnych oznaczeń`)}
+  ${other.length?`<p class="note">Ważne oznaczenia także w: ${other.map(g=>`${T0(g.T)} °C (${g.full.length} szt.)`).join(', ')}.</p>`:''}
+  ${warn}${curves}${tbl}${form}
+  ${warn}${curves}${tbl}${form}`}}
+const LEP={rot:{n:'PN-EN 13302 · wiskozymetr rotacyjny',u:'mPa·s',name:'Lepkość dynamiczna'},cap:{n:'PN-EN 12596 · kapilara próżniowa',k:'Stała K [Pa·s/s]',u:'Pa·s',name:'Lepkość dynamiczna'},kin:{n:'PN-EN 12595 · lepkość kinematyczna',k:'Stała C [mm²/s²]',u:'mm²/s',name:'Lepkość kinematyczna'}};
+function lepSet(t,set){let vals;
+  if(t.m==='rot')vals=set.reads.map(num).filter(isFinite);else vals=set.cap.map(([K,x])=>num(K)*num(x)).filter(isFinite);
+  if(!vals.length)return null;const L=LEP[t.m],avg=mean(vals),spread=vals.length>1?(Math.max(...vals)-Math.min(...vals))/avg*100:0,d=avg>=1000?0:avg>=100?1:2;
+  return{T:set.T,val:avg,unit:L.u,vals,spread,d,txt:`${fmt(avg,d)} ${L.u} (${set.T} °C)`,short:`${fmt(avg,d)} ${L.u}`}}
+function tvChart(sets,u){if(sets.length<2)return'';const W=360,H=200,L=56,B=34,T=12,Rr=12,ps=sets.map(s=>[num(s.T),s.val]).filter(p=>isFinite(p[0])&&p[1]>0).sort((a,b)=>a[0]-b[0]);if(ps.length<2)return'';
+  const x0=Math.min(...ps.map(p=>p[0])),x1=Math.max(...ps.map(p=>p[0])),pad=(x1-x0||10)*0.1,lx0=x0-pad,lx1=x1+pad;
+  const ly=ps.map(p=>Math.log10(p[1])),y0=Math.floor(Math.min(...ly)),y1=Math.ceil(Math.max(...ly))||y0+1,yy1=y1===y0?y0+1:y1;
+  const x=v=>L+(v-lx0)/(lx1-lx0)*(W-L-Rr),y=v=>H-B-(Math.log10(v)-y0)/(yy1-y0)*(H-B-T);const yt=[];for(let e=y0;e<=yy1;e++)yt.push(Math.pow(10,e));
+  return`<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Lepkość w funkcji temperatury">
+  ${yt.map(v=>`<line class="ax" x1="${L}" x2="${W-Rr}" y1="${y(v)}" y2="${y(v)}" opacity=".5"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${v>=1?String(v).replace(/\B(?=(\d{3})+(?!\d))/g,' '):v}</text>`).join('')}
+  <line class="ax" x1="${L}" x2="${W-Rr}" y1="${H-B}" y2="${H-B}"/>
+  ${ps.map(p=>`<text x="${x(p[0])}" y="${H-B+16}" text-anchor="middle">${fmt(p[0],0)}</text>`).join('')}
+  <polyline class="lineF" points="${ps.map(p=>x(p[0]).toFixed(1)+','+y(p[1]).toFixed(1)).join(' ')}"/>
+  ${ps.map(p=>`<circle class="mark" cx="${x(p[0])}" cy="${y(p[1])}" r="4.5"/>`).join('')}
+  <text x="${W-Rr}" y="${H-4}" text-anchor="end">temperatura [°C]</text><text x="${L}" y="${T}" dx="4">${u} (skala log.)</text>
+  </svg><p class="note" style="margin-top:4px">Lepkość w funkcji temperatury, oś pionowa w skali logarytmicznej.</p></div>`}
+function calcLep(t){normLep(t);const L=LEP[t.m],sets=t.sets.map(st=>lepSet(t,st)).filter(Boolean);
+  if(!sets.length)return{...empty('Wpisz odczyty.'),sets:[]};
+  const form=`<div class="formula">${t.m==='rot'?'η = średnia z odczytów aparatu':t.m==='cap'?'η = K × t, wynik = średnia z pomiarów':'ν = C × t, wynik = średnia z pomiarów'}</div>`;
+  if(sets.length===1){const a=sets[0];
+    return{val:a.val,unit:a.unit,txt:a.txt,sets,html:`<div class="lbl">${L.name} w ${esc(a.T)} °C</div><div class="big">${fmt(a.val,a.d)}<small>${a.unit}</small></div>
+    ${chip(null,a.vals.length>1?`Rozrzut ${fmt(a.spread,1)} % średniej`:'Jeden pomiar')}
+    <dl>${a.vals.map((v,i)=>`<dt>Pomiar ${i+1}</dt><dd>${fmt(v,a.d)}</dd>`).join('')}${t.m==='rot'?`<dt>W Pa·s</dt><dd>${fmt(a.val/1000,3)}</dd>`:''}</dl>
+    ${a.vals.length>1?`<div class="chart">${dotPlot(a.vals,a.val,null,a.d)}</div>`:''}${form}
+    <p class="note">Rozrzut porównaj z powtarzalnością podaną w normie dla Twojego zakresu lepkości.</p>`}}
+  return{val:sets[0].val,unit:L.u,txt:sets.map(a=>a.txt).join('; '),sets,html:`<div class="lbl">${L.name} w ${sets.length} temperaturach</div>
+    <div class="tbl" style="margin-top:8px"><table><thead><tr><th>Temperatura</th><th>Lepkość [${L.u}]</th>${t.m==='rot'?'<th>[Pa·s]</th>':''}<th>Rozrzut</th></tr></thead><tbody>
+    ${sets.map(a=>`<tr><td class="num">${esc(a.T)} °C</td><td class="num"><b>${fmt(a.val,a.d)}</b></td>${t.m==='rot'?`<td class="num">${fmt(a.val/1000,3)}</td>`:''}<td class="num">${a.vals.length>1?fmt(a.spread,1)+' %':'1 pomiar'}</td></tr>`).join('')}</tbody></table></div>
+    ${tvChart(sets,L.u)}${form}`}}
+const CALC={pen:calcPen,pik:calcPik,ner:calcNer,en:calcEn,lep:calcLep};
+function compute(s){const r={};for(const k of KEYS){const t=s.tests[k];
+  if(t.st!=='ok'){const fail=t.st==='fail',why=(t.why||'').trim();
+    r[k]={status:t.st,txt:(fail?'nie wyszło':'nie wykonywano')+(why?` (${why})`:''),html:`<div class="lbl">Wynik</div>
+    <div class="${fail?'failbox':''}"><div class="big" style="font-size:26px;margin:0">${fail?'Badanie nie wyszło':'Nie wykonywano'}</div>
+    ${chip(fail?false:null,fail?'Do powtórzenia':'Pominięte w zestawieniu')}${why?`<p class="note" style="color:var(--ink)">Powód: ${esc(why)}</p>`:''}</div>
+    <p class="note">Wpisane odczyty zostają w formularzu. Gdy powtórzysz badanie, wpisz nowe odczyty i zmień status na „Wykonane”.</p>`}}
+  else r[k]=CALC[k](t)}
+  if(r.pen.val!==undefined&&r.pik.val!==undefined){const P=r.pen.val,T=r.pik.val,l=Math.log10(P),pi=(20*T+500*l-1952)/(T-50*l+120);r.pi={val:pi,txt:fmt(pi,1)}}else r.pi={};
+  return r}
+const PI_REQ={'50/70':1,'70/100':1,'160/220':1};
+const lims=s=>({pi:PI_REQ[s.grade]?['-1.5','0.7','']:['','',''],pen:[s.req.pmin,s.req.pmax,''],pik:[s.req.kmin,s.req.kmax,' °C'],ner:[s.req.ner,'',' %'],en:[s.req.en,'',' J/cm²'],lep:[s.req.lep,'','']});
+function inRange(v,mn,mx){if(v===undefined||v===null)return null;const a=num(mn),b=num(mx);if(!isFinite(a)&&!isFinite(b))return null;return(!isFinite(a)||v>=a)&&(!isFinite(b)||v<=b)}
+function rq(mn,mx,u=''){const a=num(mn),b=num(mx),f=x=>fmt(x,x%1?1:0);if(isFinite(a)&&isFinite(b))return`${f(a)}–${f(b)}${u}`;if(isFinite(a))return`≥ ${f(a)}${u}`;if(isFinite(b))return`≤ ${f(b)}${u}`;return'—'}
+function expand(r){const out=[];for(const k of KEYS){const x=r[k];
+    if(k==='lep'&&!x.status&&x.sets&&x.sets.length>0)x.sets.forEach(st=>out.push({k:'lep',key:'lep@'+num(st.T),name:`Lepkość w ${st.T} °C`,nom:`Lepkość w ${st.T} °C`,res:st}));
+    else out.push({k,key:k,name:NAMES[k],nom:NOM_[k],res:x})}
+  out.push({k:'pi',key:'pi',name:NAMES.pi,nom:NOM_.pi,res:r.pi});return out}
+function baseFor(it,rb){if(!rb)return null;if(it.key.startsWith('lep@')){const m=(rb.lep.sets||[]).find(st=>num(st.T)===num(it.res.T));return m||{}}return rb[it.k]}
+const NOM_={pen:'Penetracja',pik:'Temperatura mięknienia PiK',ner:'Nawrót sprężysty',en:'Energia odkształcenia E′s',lep:'Lepkość',pi:'Indeks penetracji PI'};
+function delta(k,a,b){if(!a||!b||a.val===undefined||b.val===undefined)return null;if(k==='lep'&&a.unit!==b.unit)return null;return a.val-b.val}
+
+/* ===== wykresy ===== */
+function niceTicks(a,b,n=4){const st=Math.pow(10,Math.floor(Math.log10((b-a)/n||1)));const m=[1,2,2.5,5,10].find(k=>(b-a)/(st*k)<=n)||10;const s=st*m,t=[];for(let v=Math.ceil(a/s)*s;v<=b+1e-9;v+=s)t.push(+v.toFixed(6));return t}
+function dotPlot(vals,m,half,dec=1){if(!vals.length)return'';const W=340,H=74,L=12,Rr=12;
+  let lo=Math.min(...vals,half?m-half:Infinity),hi=Math.max(...vals,half?m+half:-Infinity);const pad=(hi-lo||1)*0.25;lo-=pad;hi+=pad;
+  const x=v=>L+(v-lo)/(hi-lo)*(W-L-Rr),ticks=niceTicks(lo,hi,4);
+  return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Odczyty na osi wartości">
+  ${half?`<rect class="band" x="${x(m-half)}" y="10" width="${x(m+half)-x(m-half)}" height="30" rx="3"/>`:''}
+  <line class="ax" x1="${L}" x2="${W-Rr}" y1="48" y2="48"/>
+  ${ticks.map(t=>`<line class="ax" x1="${x(t)}" x2="${x(t)}" y1="48" y2="52"/><text x="${x(t)}" y="64" text-anchor="middle">${fmt(t,t%1?1:0)}</text>`).join('')}
+  <line class="mean" x1="${x(m)}" x2="${x(m)}" y1="6" y2="44"/>
+  ${vals.map((v,i)=>`<circle class="dot" cx="${x(v)}" cy="${25+((i%3)-1)*7}" r="4.5"><title>${fmt(v,dec)}</title></circle>`).join('')}
+  </svg><p class="note" style="margin-top:4px">Kropki to odczyty, żółta kreska to średnia${half?', zielone pole to dopuszczalny rozstęp':''}.</p>`}
+function curveChart(sets){const all=sets.flat();if(!all.length)return'';const W=360,H=210,L=40,B=34,T=10,Rr=10;
+  const xm=Math.max(400,...all.map(p=>p[0])),ym=Math.max(...all.map(p=>p[1]))*1.1||1;
+  const x=v=>L+v/xm*(W-L-Rr),y=v=>H-B-v/ym*(H-B-T);const xt=niceTicks(0,xm,4),yt=niceTicks(0,ym,4);
+  return`<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Krzywe siła–wydłużenie">
+  <rect class="zone" x="${x(200)}" y="${T}" width="${x(400)-x(200)}" height="${H-B-T}"/>
+  ${yt.map(t=>`<line class="ax" x1="${L}" x2="${W-Rr}" y1="${y(t)}" y2="${y(t)}" opacity=".5"/><text x="${L-6}" y="${y(t)+4}" text-anchor="end">${fmt(t,t%1?1:0)}</text>`).join('')}
+  ${xt.map(t=>`<text x="${x(t)}" y="${H-B+16}" text-anchor="middle">${fmt(t,0)}</text>`).join('')}
+  <line class="ax" x1="${L}" x2="${W-Rr}" y1="${H-B}" y2="${H-B}"/>
+  ${sets.map((p,i)=>`<polyline class="${i===0?'lineF':'lineA'}" points="${p.map(q=>x(q[0]).toFixed(1)+','+y(q[1]).toFixed(1)).join(' ')}"/>`).join('')}
+  <text x="${(x(200)+x(400))/2}" y="${T+14}" text-anchor="middle">E′s</text>
+  <text x="${W-Rr}" y="${H-4}" text-anchor="end">wydłużenie [mm]</text><text x="${L}" y="${T+2}" dx="4">siła [N]</text>
+  </svg><p class="note" style="margin-top:4px">Żółta linia to próbka 1, szare to pozostałe. Pas 200–400 mm to zakres energii E′s.</p></div>`}
+function bulletChart(items){if(!items.length)return'<p class="note">Wykres pojawi się, gdy będą wyniki.</p>';const W=420,rowH=46,Rr=10;
+  return`<svg viewBox="0 0 ${W} ${items.length*rowH+4}" role="img" aria-label="Wyniki na tle wymagań">${items.map((it,i)=>{
+    const y0=i*rowH,vs=[it.v,it.b].filter(v=>v!==undefined&&v!==null);let lo=Math.min(...vs,isFinite(it.mn)?it.mn:Infinity),hi=Math.max(...vs,isFinite(it.mx)?it.mx:-Infinity);
+    const pad=(hi-lo||Math.abs(it.v)||1)*0.3;lo=Math.max(0,lo-pad);hi+=pad;const x=v=>(v-lo)/(hi-lo)*(W-Rr);
+    const has=isFinite(it.mn)||isFinite(it.mx),a=isFinite(it.mn)?it.mn:lo,b=isFinite(it.mx)?it.mx:hi;
+    return`<text class="lbltxt" x="0" y="${y0+12}">${esc(it.name)}</text><text x="${W-Rr}" y="${y0+12}" text-anchor="end">${esc(it.txt)}</text>
+    <rect x="0" y="${y0+20}" width="${W-Rr}" height="14" rx="3" style="fill:var(--bg);stroke:var(--line)"/>
+    ${has?`<rect class="${it.ok===false?'bandBad':'band'}" x="${x(a)}" y="${y0+20}" width="${Math.max(2,x(b)-x(a))}" height="14" rx="3"/>`:''}
+    ${it.b!==undefined&&it.b!==null?`<rect class="bmark" x="${x(it.b)-4}" y="${y0+21}" width="8" height="12" rx="2"/>`:''}
+    <circle class="mark" cx="${x(it.v)}" cy="${y0+27}" r="6"/>`}).join('')}</svg>
+  <p class="note" style="margin-top:6px">Żółta kropka to wynik${items.some(i=>isFinite(i.mn)||isFinite(i.mx))?', zielone pole to zakres wymagany':''}${items.some(i=>i.b!=null)?', niebieski znacznik to próbka bazowa':''}. Każdy wiersz ma własną skalę.</p>`}
+function barsChart(rows,dec){const W=360,rh=40,LW=138,vmax=Math.max(...rows.filter(r=>r.v!==undefined).map(r=>Math.abs(r.v)))||1;
+  return`<svg viewBox="0 0 ${W} ${rows.length*rh+4}" role="img" style="font-size:15px">${rows.map((r,i)=>{const y=i*rh,nm=r.name.length>17?r.name.slice(0,16)+'…':r.name;
+    // brak wyniku: zamiast słupka kreska i opis
+    if(r.v===undefined)return`<text class="lbltxt" x="0" y="${y+24}" style="font-size:14px">${esc(nm)}</text><line x1="${LW}" x2="${LW+26}" y1="${y+19}" y2="${y+19}" style="stroke:var(--muted);stroke-width:2;stroke-dasharray:4 3"/><text x="${LW+34}" y="${y+24}" style="font-size:13px;font-style:italic;fill:${r.miss==='nie wyszło'?'var(--bad)':'var(--muted)'}">${esc(r.miss||'brak wyniku')}</text>`;
+    const w=Math.max(3,Math.abs(r.v)/vmax*(W-LW-70));
+    return`<text class="lbltxt" x="0" y="${y+24}" style="font-size:14px">${esc(nm)}</text><rect class="bar" style="fill:${r.col||'var(--muted)'}" x="${LW}" y="${y+8}" width="${w}" height="22" rx="4"/><text x="${LW+w+7}" y="${y+24}" style="font-size:14px;fill:var(--ink)">${fmt(r.v,dec)}</text>`}).join('')}</svg>`}
+
+/* ===== widoki ===== */
+function show(v){if(v==='tests'&&!cur)v='start';view=v;if(v==='tests')store.set('asf_last',cur.id);
+  document.querySelectorAll('.view').forEach(s=>s.hidden=s.id!=='v-'+v);
+  document.querySelectorAll('#nav button').forEach(b=>{b.setAttribute('aria-current',b.dataset.v===v);b.disabled=b.dataset.v==='tests'&&!cur});
+  if(v==='start')renderStart();if(v==='tests'){renderAllInputs();renderResults()}if(v==='compare')renderCompare();if(v==='notes')renderNotes();if(v==='calc')renderCalc();if(v==='cnote')renderCalcNote();
+  scrollTo(0,0)}
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]')||e.target.closest('#nav button');if(g)show(g.dataset.go||g.dataset.v)});
+
+/* ----- eksport / import danych (ten sam format co plik Dane\pavialab-dane.json w wersji na komputer) ----- */
+const XKEYS=['asf_samples','asf_grades2','asf_comp2','asf_notes','asf_last'];
+let impPending=null;
+function xmsg(t,bad){const m=$('#xferMsg');m.textContent=t;m.style.color=bad?'var(--bad)':''}
+document.addEventListener('click',e=>{const t=e.target;
+  if(t.id==='expBtn'){const d={};XKEYS.forEach(k=>{const v=store.get(k,null);if(v!==null)d[k]=v});
+    const name=`pavialab-dane-${new Date().toISOString().slice(0,10)}.json`,blob=new Blob([JSON.stringify(d,null,1)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);
+    xmsg(`Zapisano plik ${name} (${(d.asf_samples||[]).length} próbek). Znajdziesz go w folderze Pobrane.`);return}
+  if(t.id==='impBtn'){if(impPending){applyImport();return}$('#impFile').click();return}
+  if(t.id==='impCancel'){impPending=null;$('#impBtn').textContent='Importuj dane';xmsg('');return}});
+document.addEventListener('change',e=>{if(e.target.id!=='impFile')return;const f=e.target.files[0];e.target.value='';if(!f)return;
+  const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!Array.isArray(d.asf_samples))throw 0;impPending=d;
+      $('#impBtn').textContent='Potwierdź import';$('#xferMsg').innerHTML=`Plik zawiera ${d.asf_samples.length} próbek. Import zastąpi obecne dane na tym urządzeniu (${samples.length} próbek). Kliknij „Potwierdź import” albo <button class="sec" id="impCancel" style="padding:2px 10px">Anuluj</button>`}
+    catch(err){xmsg('To nie jest plik z danymi PaviaLAB.',true)}};r.readAsText(f)});
+function applyImport(){const d=impPending;impPending=null;XKEYS.forEach(k=>{if(d[k]!==undefined)store.set(k,d[k])});
+  if(DESK)deskFlush();xmsg('Wczytano dane. Odświeżam…');setTimeout(()=>location.reload(),600)}
+
+/* ----- start ----- */
+let quickMsg='',quickBase=false;
+function renderQuick(){const bases=samples.filter(x=>x.isBase),def=(bases[bases.length-1]||{}).id||'';
+  $('#quickAdd').innerHTML=`
+  <div class="qnorm" style="margin:0;padding:0;border:0"><span class="lbl">Dodaj próbkę normową</span>
+    <div class="qgroup"><span class="note" style="margin:0">Asfalty drogowe · PN-EN 12591</span><div class="chips" style="margin:4px 0 0">${GRADES.filter(g=>!g[0].startsWith('PMB')).map(g=>`<button data-qnorm="${g[0]}">${g[0]}</button>`).join('')}</div></div>
+    <div class="qgroup"><span class="note" style="margin:0">Asfalty modyfikowane · PN-EN 14023</span><div class="chips" style="margin:4px 0 0">${GRADES.filter(g=>g[0].startsWith('PMB')).map(g=>`<button data-qnorm="${g[0]}">${g[0]}</button>`).join('')}</div></div>
+    <p class="note" style="margin:0">Kliknij, żeby od razu dodać próbkę z wymaganiami z normy (penetracja i PiK). Status bazowej i porównanie ustawisz w tabeli poniżej.</p>
+  </div>${quickMsg?`<p class="note" style="margin:8px 0 0;color:var(--ink)">${quickMsg}</p>`:''}`}
+function uniqueNr(n){if(!samples.some(x=>x.nr===n))return n;let i=2;while(samples.some(x=>x.nr===`${n} (${i})`))i++;return`${n} (${i})`}
+document.addEventListener('change',e=>{if(e.target.id==='q_base'){quickBase=e.target.checked;const w=$('#q_cmpw');if(w)w.hidden=quickBase}
+  const gs=e.target.dataset.gradeset;if(gs){const x=byId(gs);x.grade=e.target.value;applyGrade(x);save();return}
+  const bs=e.target.dataset.baseset;if(bs){byId(bs).baseId=e.target.value;save();return}
+  const bt=e.target.dataset.basetoggle;if(bt){const x=byId(bt);x.isBase=e.target.checked;if(x.isBase)x.baseId='';save();quickMsg='';renderStart()}});
+document.addEventListener('click',e=>{if(e.target.id!=='q_add')return;const nr=$('#q_nr').value.trim();
+  if(!nr){quickMsg='<span style="color:var(--bad)">Wpisz nazwę próbki.</span>';renderQuick();$('#q_nr').focus();return}
+  const n=newSample({isBase:quickBase});n.nr=uniqueNr(nr);
+  if(!quickBase&&$('#q_cmp'))n.baseId=$('#q_cmp').value;samples.push(n);save();
+  quickMsg=`Dodano <b>${esc(n.nr)}</b>${n.isBase?' jako próbkę bazową':''}. <button class="sec" data-open="${n.id}" style="margin-left:6px">Wpisz wyniki →</button>`;renderStart()});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-qnorm]');if(!b)return;const g=b.dataset.qnorm,pmb=g.startsWith('PMB');
+  const n=newSample({grade:g});n.nr=uniqueNr(g);applyGrade(n);
+  n.comps=[{n:pmb?`Asfalt modyfikowany polimerem ${g.slice(4)}`:`Asfalt drogowy ${g}`,p:'100'}];n.desc=`${pmb?'Asfalt modyfikowany polimerem':'Asfalt drogowy'} ${pmb?g.slice(4):g} (${pmb?'PN-EN 14023':'PN-EN 12591'})`;
+  samples.push(n);save();
+  quickMsg=`Dodano próbkę normową <b>${esc(n.nr)}</b>. <button class="sec" data-open="${n.id}" style="margin-left:6px">Wpisz wyniki →</button>`;renderStart()});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='q_nr'){e.preventDefault();$('#q_add').click()}});
+function renderStart(){const tb=$('#sampleList'),ls=samples.length?lastSample():null;renderQuick();
+  $('#heroNew').hidden=!ls;$('#startHint').innerHTML=ls?`START otworzy ostatnią próbkę: <b style="color:#eef1ef">${esc(label(ls))}</b>${ls.desc?' · '+esc(ls.desc):''}. Nową dodasz przyciskiem obok.`:'START otworzy okienko dodawania pierwszej próbki.';
+  if(!samples.length){tb.innerHTML=`<tr><td colspan="5" class="note">Nie masz jeszcze zapisanych próbek. Dodaj pierwszą z listy powyżej albo kliknij START.</td></tr>`;$('#listNote').textContent='';return}
+  tb.innerHTML=samples.map(s=>{const r=compute(s),done=KEYS.filter(k=>r[k].val!==undefined).length,fail=KEYS.filter(k=>r[k].status==='fail').length,b=byId(s.baseId);
+    return`<tr><td>${s.code?`<span class="delta" style="font-family:var(--f-mono)">${esc(s.code)}</span>`:''}<b>${esc(label(s))}</b>${s.example?'<span class="tag ex">przykład</span>':''}${s.desc?`<span class="delta">${esc(s.desc)}</span>`:''}</td>
+    <td><label class="check" title="Ustaw jako próbkę bazową"><input type="checkbox" data-basetoggle="${s.id}" ${s.isBase?'checked':''}>tak</label></td>
+    <td>${s.isBase?'<span class="note" style="margin:0">—</span>':`<select class="cellsel" data-baseset="${s.id}" aria-label="Próbka bazowa dla ${esc(label(s))}"><option value="">— bez porównania —</option>${samples.filter(o=>o.id!==s.id).map(o=>`<option value="${o.id}"${s.baseId===o.id?' selected':''}>${esc(label(o))}${o.isBase?' (bazowa)':''}</option>`).join('')}</select>`}</td>
+    <td>${done}/5 wyników${fail?` · <span style="color:var(--bad)">${fail} do powtórzenia</span>`:''}</td>
+    <td><div class="btns" style="justify-content:flex-end;flex-wrap:nowrap"><button class="sec" data-open="${s.id}">Wyniki</button><button class="sec" data-edit="${s.id}">Edytuj</button><button class="sec danger" data-delid="${s.id}">Usuń</button></div></td></tr>`}).join('');
+  $('#listNote').textContent=samples.some(s=>s.example)?'Dwie próbki oznaczone „przykład” pokazują, jak działa program. Możesz je usunąć.':''}
+const lastSample=()=>byId(store.get('asf_last',''))||samples[samples.length-1];
+$('#startBtn').addEventListener('click',()=>{if(samples.length){cur=lastSample();show('tests')}else openModal(null)});
+document.addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o){cur=byId(o.dataset.open);show('tests');return}
+  const d=e.target.closest('[data-delid]');if(!d)return;
+  if(!d.dataset.arm){d.dataset.arm='1';d.textContent='Na pewno?';setTimeout(()=>{if(d.isConnected){delete d.dataset.arm;d.textContent='Usuń'}},3000);return}
+  const id=d.dataset.delid;samples=samples.filter(s=>s.id!==id);samples.forEach(s=>{if(s.baseId===id)s.baseId=''});if(cur?.id===id)cur=null;save();show('start')});
+
+/* ----- okno próbki ----- */
+function gradeOptions(sel){return`<option value="">— wybierz rodzaj asfaltu —</option><optgroup label="Wg norm">${GRADES.map(g=>`<option value="${g[0]}"${sel===g[0]?' selected':''}>${g[0]}</option>`).join('')}</optgroup>`+
+  (custom.length?`<optgroup label="Własne">${custom.map(c=>`<option value="c:${esc(c.name)}"${sel==='c:'+c.name?' selected':''}>${esc(c.name)}</option>`).join('')}</optgroup>`:'')}
+const dlg=$('#sampleDlg');let draft=null,editId=null,parent=null;
+function openModal(id,msg='',preset){editId=id;draft=preset||(id?JSON.parse(JSON.stringify(byId(id))):newSample());draft._msg=msg;
+  $('#dlgErr').textContent='';renderModal();try{dlg.showModal()}catch(e){dlg.setAttribute('open','')}setTimeout(()=>$('#m_nr')?.focus(),40)}
+function closeModal(){try{dlg.close()}catch(e){dlg.removeAttribute('open')}}
+function renderModal(){const d=draft;if(!Array.isArray(d.comps))d.comps=[];if(!d.comps.length)d.comps.push({n:'',p:''});
+  $('#dlgTitle').textContent=editId?'Dane próbki':'Nowa próbka';
+  $('#dlgSave').textContent='Zapisz i wpisz wyniki';
+  const sum=d.comps.reduce((a,c)=>a+(isFinite(num(c.p))?num(c.p):0),0),mu=d.massUnit||'g';
+  $('#dlgBody').innerHTML=`${d._msg?`<div class="dlg-msg">${d._msg}</div>`:''}
+  <div class="dsec"><div class="lbl">Próbka</div>
+    <div class="row"><div class="field" style="flex:0 1 150px"><label for="m_code">Nr próbki</label><input id="m_code" data-m="code" value="${esc(d.code||'')}" placeholder="np. P-128/26" autocomplete="off"></div>
+      <div class="field" style="flex-basis:220px"><label for="m_nr">Nazwa próbki *</label><input id="m_nr" data-m="nr" value="${esc(d.nr)}" placeholder="np. 70/100 + 4 % SBS" autocomplete="off"></div>
+      <div class="field"><label for="m_date">Data badania</label><input id="m_date" data-m="date" type="date" value="${esc(d.date)}"></div>
+      <div class="field"><label for="m_who">Wykonał</label><input id="m_who" data-m="who" value="${esc(d.who)}"></div></div></div>
+  <div class="dsec"><div class="lbl">Składniki</div>
+    <div class="comprows">
+      <div class="crow chead"><span class="lbl">Składnik</span><span class="lbl munit">Masa <select id="m_unit" aria-label="Jednostka masy"><option value="g"${mu==='g'?' selected':''}>g</option><option value="kg"${mu==='kg'?' selected':''}>kg</option></select></span><span class="lbl">Udział [%]</span><span></span></div>
+      ${d.comps.map((c,i)=>`<div class="crow"><div class="cbox"><input data-cn="${i}" value="${esc(c.n)}" placeholder="wybierz lub wpisz nowy" aria-label="Składnik ${i+1}" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="cbList"><button type="button" class="cbtn" data-cbtn="${i}" tabindex="-1" aria-label="Pokaż listę składników">▾</button></div>
+        <input data-cm="${i}" type="number" step="any" min="0" inputmode="decimal" value="${esc(c.m||'')}" placeholder="${mu}" aria-label="Masa składnika ${i+1} w ${mu}">
+        <input data-cp="${i}" type="number" step="any" min="0" max="100" inputmode="decimal" value="${esc(c.p)}" placeholder="%" aria-label="Udział składnika ${i+1} w procentach" class="${hasMass(d)&&isFinite(num(c.m))?'pauto':''}" title="${hasMass(d)?'Liczone z masy':''}">
+        <button type="button" class="sec crm" data-crm="${i}" aria-label="Usuń składnik ${i+1}">×</button></div>`).join('')}
+    </div>
+    <div class="btns"><button type="button" class="sec" id="m_compAdd">+ Dodaj składnik</button><span class="note" id="m_sum" style="margin:0">${sumNote(sum,d)}</span></div>
+    <p class="note" style="margin:0">Wpisz masę w g lub kg, a udział w % policzy się sam. Możesz też wpisać sam %. Lista podpowiada typowe dodatki. Nowy składnik wpisz w polu, a po zapisaniu próbki pojawi się na liście jako „własny”. Własne składniki usuniesz krzyżykiem na liście.</p></div>`}
+const hasMass=d=>d.comps.some(c=>num(c.m)>0);
+const totMass=d=>d.comps.reduce((a,c)=>a+(num(c.m)>0?num(c.m):0),0);
+const fmtN=(x,d=2)=>isFinite(x)?String(+x.toFixed(d)).replace('.',','):'';
+function recalcPct(){const d=draft,t=totMass(d);if(!(t>0))return;
+  d.comps.forEach((c,i)=>{if(num(c.m)>0){c.p=String(+(num(c.m)/t*100).toFixed(2));const inp=dlg.querySelector(`[data-cp="${i}"]`);if(inp){inp.value=c.p;inp.classList.add('pauto')}}})}
+function sumNote(sum,d=draft){const t=d?totMass(d):0,mt=t>0?` · masa razem: ${fmtN(t,3)} ${d.massUnit||'g'}`:'';if(!sum)return mt?mt.slice(3):'';if(Math.abs(sum-100)<0.01)return'Suma: 100 %'+mt;
+  if(sum>100)return`<span style="color:var(--bad)">Suma: ${fmt(sum,1)} %, przekracza 100 %</span>`+mt;return`Suma: ${fmt(sum,1)} %, pozostałe ${fmt(100-sum,1)} % (np. asfalt drogowy)`+mt}
+function onModal(e){const el=e.target;if(!draft)return;
+  if(el.dataset.cn!==undefined){draft.comps[+el.dataset.cn].n=el.value;if(e.type==='input'){cbHi=-1;cbConfirm=null;showCb(+el.dataset.cn)}return}
+  const pSum=()=>draft.comps.reduce((a,c)=>a+(isFinite(num(c.p))?num(c.p):0),0);
+  if(el.dataset.cm!==undefined){draft.comps[+el.dataset.cm].m=el.value;recalcPct();$('#m_sum').innerHTML=sumNote(pSum());return}
+  if(el.id==='m_unit'){const old=draft.massUnit||'g',nu=el.value;if(old!==nu){const f=nu==='kg'?0.001:1000;draft.comps.forEach(c=>{if(num(c.m)>0)c.m=String(+(num(c.m)*f).toFixed(6))});draft.massUnit=nu;renderModal()}return}
+  if(el.dataset.cp!==undefined){draft.comps[+el.dataset.cp].p=el.value;el.classList.remove('pauto');$('#m_sum').innerHTML=sumNote(pSum());return}
+  const k=el.dataset.m;if(!k)return;const v=el.type==='radio'?el.value==='1':el.value;if(getPath(draft,k)===v)return;
+  if(k==='isBase'){draft.isBase=v;if(v)draft.baseId='';renderModal();return}
+  setPath(draft,k,v)}
+dlg.addEventListener('input',onModal);dlg.addEventListener('change',onModal);
+dlg.addEventListener('click',e=>{const t=e.target;
+  if(t.id==='m_compAdd'){draft.comps.push({n:'',p:''});renderModal();const ins=dlg.querySelectorAll('[data-cn]');ins[ins.length-1].focus();return}
+  if(t.dataset.crm!==undefined){draft.comps.splice(+t.dataset.crm,1);renderModal();return}
+  if(t.id==='dlgX'||t.id==='dlgCancel'){cancelModal()}});
+/* własna lista składników (z usuwaniem własnych pozycji) */
+let openCb=null,cbHi=-1,cbConfirm=null;
+const cbItems=i=>{const q=(draft.comps[i]?.n||'').trim().toLowerCase();return q&&!comps.some(c=>c.toLowerCase()===q)?comps.filter(c=>c.toLowerCase().includes(q)):comps};
+function showCb(i){const el=$('#cbList'),box=dlg.querySelector(`[data-cn="${i}"]`)?.parentElement;if(!box)return;openCb=i;const items=cbItems(i);
+  el.innerHTML=items.length?items.map((c,j)=>{const own=!COMP_DEF.includes(c);
+    if(cbConfirm===c)return`<div class="copt conf"><span>Usunąć składnik „${esc(c)}” z listy?</span><span class="btns"><button type="button" class="sec danger" data-cyes="${esc(c)}">Usuń</button><button type="button" class="sec" data-cno>Anuluj</button></span></div>`;
+    return`<div class="copt${j===cbHi?' hi':''}" role="option" aria-selected="${j===cbHi}" data-pick="${esc(c)}"><span>${esc(c)}${own?'<span class="owntag">własny</span>':''}</span>${own?`<button type="button" class="cx" data-cx="${esc(c)}" aria-label="Usuń składnik ${esc(c)}">×</button>`:''}</div>`}).join('')
+    :'<div class="copt empty">Nowy składnik. Zapisze się na liście po zapisaniu próbki.</div>';
+  el.hidden=false;box.querySelector('input').setAttribute('aria-expanded','true');
+  placeCb(el,box);
+  const hi=el.querySelector('.hi');if(hi){if(hi.offsetTop<el.scrollTop)el.scrollTop=hi.offsetTop;else if(hi.offsetTop+hi.offsetHeight>el.scrollTop+el.clientHeight)el.scrollTop=hi.offsetTop+hi.offsetHeight-el.clientHeight}}
+// pozycja względem ekranu, żeby lista nie była przycinana przez przewijane okienko
+function placeCb(el,box){const r=box.getBoundingClientRect(),d=dlg.getBoundingClientRect(),below=innerHeight-r.bottom-12,above=r.top-12,h=Math.min(250,el.scrollHeight),down=below>=h||below>=above;
+  el.style.left=(r.left-d.left)+'px';el.style.width=r.width+'px';el.style.maxHeight=Math.max(120,Math.min(250,down?below:above))+'px';
+  if(down){el.style.top=(r.bottom-d.top+4)+'px';el.style.bottom=''}else{el.style.top='';el.style.bottom=(d.bottom-r.top+4)+'px'}}
+function hideCb(){$('#cbList').hidden=true;dlg.querySelectorAll('[data-cn]').forEach(x=>x.setAttribute('aria-expanded','false'));openCb=null;cbHi=-1;cbConfirm=null}
+function pickCb(i,v){draft.comps[i].n=v;const inp=dlg.querySelector(`[data-cn="${i}"]`);inp.value=v;hideCb();dlg.querySelector(`[data-cm="${i}"]`).focus()}
+$('#dlgBody').addEventListener('scroll',()=>{if(openCb!==null){const box=dlg.querySelector(`[data-cn="${openCb}"]`)?.parentElement;if(box)placeCb($('#cbList'),box)}});addEventListener('resize',()=>hideCb());
+dlg.addEventListener('focusin',e=>{const i=e.target.dataset.cn;if(i!==undefined){cbHi=-1;cbConfirm=null;showCb(+i)}});
+dlg.addEventListener('focusout',e=>{if(e.target.dataset.cn!==undefined&&!(e.relatedTarget&&(e.relatedTarget.closest('.cbox')||e.relatedTarget.closest('#cbList'))))hideCb()});
+dlg.addEventListener('mousedown',e=>{if(e.target.closest('.clist')||e.target.closest('.cbtn'))e.preventDefault()});
+dlg.addEventListener('click',e=>{const t=e.target;
+  const cb=t.closest('[data-cbtn]');if(cb){const i=+cb.dataset.cbtn;if(openCb===i)hideCb();else{dlg.querySelector(`[data-cn="${i}"]`).focus();showCb(i)}return}
+  if(t.closest('[data-cx]')){cbConfirm=t.closest('[data-cx]').dataset.cx;showCb(openCb);return}
+  if(t.closest('[data-cyes]')){const v=t.closest('[data-cyes]').dataset.cyes;comps=comps.filter(x=>x!==v);store.set('asf_comp2',comps);cbConfirm=null;showCb(openCb);return}
+  if(t.closest('[data-cno]')){cbConfirm=null;showCb(openCb);return}
+  const pk=t.closest('[data-pick]');if(pk&&openCb!==null){pickCb(openCb,pk.dataset.pick)}});
+dlg.addEventListener('keydown',e=>{const isCn=e.target.dataset.cn!==undefined;
+  if(isCn&&openCb!==null&&(e.key==='ArrowDown'||e.key==='ArrowUp')){e.preventDefault();const n=cbItems(openCb).length;if(!n)return;cbConfirm=null;cbHi=e.key==='ArrowDown'?(cbHi+1)%n:(cbHi<=0?n-1:cbHi-1);showCb(openCb);return}
+  if(isCn&&e.key==='Escape'&&openCb!==null){e.preventDefault();e.stopPropagation();hideCb();return}
+  if(e.key==='Enter'&&isCn&&openCb!==null&&cbHi>=0){e.preventDefault();pickCb(openCb,cbItems(openCb)[cbHi]);return}
+  if(e.key==='Enter'&&(isCn||e.target.dataset.cp!==undefined)){e.preventDefault();hideCb();$('#m_compAdd').click()}});
+dlg.addEventListener('cancel',e=>{e.preventDefault();cancelModal()});
+function cancelModal(){draft=null;closeModal()}
+const compText=(cs,u='g')=>cs.map(c=>c.n.trim()+(isFinite(num(c.p))?` ${fmtN(num(c.p),2)} %`:'')+(num(c.m)>0?` (${fmtN(num(c.m),3)} ${u})`:'')).join(', ');
+$('#dlgForm').addEventListener('submit',e=>{e.preventDefault();const d=draft,err=$('#dlgErr');
+  if(!d.nr.trim()){err.textContent='Wpisz nazwę próbki.';$('#m_nr').focus();return}
+  d.comps=d.comps.filter(c=>c.n.trim());let added=false;
+  d.comps.forEach(c=>{if(!comps.some(x=>x.toLowerCase()===c.n.trim().toLowerCase())){comps.push(c.n.trim());added=true}});if(added)store.set('asf_comp2',comps);
+  if(d.comps.length)d.desc=compText(d.comps,d.massUnit||'g');
+  delete d._msg;
+  if(editId){const i=samples.findIndex(x=>x.id===editId);samples[i]=d}else samples.push(d);save();
+  cur=d;draft=null;closeModal();show('tests')});
+document.addEventListener('click',e=>{const n=e.target.closest('[data-new]');if(n){openModal(null);return}const ed=e.target.closest('[data-edit]');if(ed)openModal(ed.dataset.edit)});
+
+/* ----- badania: pola ----- */
+const inp=(k,v,a='')=>`<input data-k="${k}" id="i_${k.replace(/\./g,'_')}" value="${esc(v)}" ${a}>`;
+const fld=(k,v,lab,a='type="number" step="any" inputmode="decimal"')=>`<div class="field"><label for="i_${k.replace(/\./g,'_')}">${lab}</label>${inp(k,v,a)}</div>`;
+const MINR={'pen.reads':3,'ner.reads':2,'lep.sets.*.reads':1,'lep.sets.*.cap':2};
+function readsGrid(path,arr,lab){return`<div class="reads">${arr.map((v,i)=>fld(`tests.${path}.${i}`,v,`${lab} ${i+1}`)).join('')}</div>
+  <div class="btns"><button class="sec" data-addr="${path}">+ Dodaj</button><button class="sec" data-delr="${path}">− Usuń ostatni</button></div>`}
+function renderStatus(k){const t=cur.tests[k];$('#st-'+k).innerHTML=`<div class="field"><label for="i_st_${k}">Status badania</label><select id="i_st_${k}" data-k="tests.${k}.st">
+  <option value="ok"${t.st==='ok'?' selected':''}>Wykonane</option><option value="fail"${t.st==='fail'?' selected':''}>Nie wyszło, do powtórzenia</option><option value="skip"${t.st==='skip'?' selected':''}>Nie wykonywano</option></select></div>
+  <div class="field" id="why-${k}" ${t.st==='ok'?'hidden':''}><label for="i_why_${k}">Powód</label><input id="i_why_${k}" data-k="tests.${k}.why" value="${esc(t.why)}" list="reasons" placeholder="wybierz lub wpisz"></div>`}
+function renderInputs(k){const t=cur.tests[k],el=$('#in-'+k);renderStatus(k);
+  if(k==='pen')while(t.reads.length<4)t.reads.push('');
+  if(k==='pen')el.innerHTML=`<div class="lbl" style="margin-bottom:6px">Oznaczenia [0,1 mm]</div>${readsGrid('pen.reads',t.reads,'Oznaczenie')}<p class="note">Domyślnie cztery oznaczenia (norma wymaga co najmniej trzech ważnych). Puste pola są pomijane. Program sprawdza rozstęp względem dopuszczalnego dla danej penetracji.</p>`;
+  if(k==='pik')el.innerHTML=`<div class="row">${fld('tests.pik.a',t.a,'Kulka 1 [°C]')}${fld('tests.pik.b',t.b,'Kulka 2 [°C]')}</div>
+    <div class="row"><div class="field"><label for="i_pikm">Ciecz w łaźni</label><select id="i_pikm" data-k="tests.pik.med"><option value="w"${t.med==='w'?' selected':''}>Woda (start 5 °C)</option><option value="g"${t.med==='g'?' selected':''}>Glicerol (start 30 °C)</option></select></div></div>
+    <p class="note">Poniżej 80 °C: zaokrąglenie do 0,2 °C, różnica kulek do 1 °C. Od 80 °C: zaokrąglenie do 0,5 °C, różnica do 2 °C.</p>`;
+  if(k==='ner')el.innerHTML=`<div class="row">${fld('tests.ner.T',t.T,'Temperatura [°C]')}${fld('tests.ner.L',t.L,'Wydłużenie L [mm]')}</div>
+    <div class="lbl" style="margin-bottom:6px">Odległość d między końcami po 30 min [mm]</div>${readsGrid('ner.reads',t.reads,'Próbka')}`;
+  if(k==='en'){normEn(t);el.innerHTML=`<div class="row">${fld('tests.en.A',t.A,'Przekrój [cm²]')}<div class="field"></div></div>
+    <p class="note" style="margin:0 0 10px">Wklej z aparatu lub Excela pary <b>wydłużenie [mm]</b> i <b>siła [N]</b>, jedna para w wierszu. Każda próbka ma swoją temperaturę.</p>
+    <p class="note" style="margin:0 0 10px">Badanie zwykle w 5 °C. Wynik to średnia z 3 ważnych oznaczeń w jednej temperaturze. Kształtka zerwana przed 400 mm jest stracona: powtórz na nowej, a gdy druga też pęknie, podnieś temperaturę o 5 °C.</p>
+    <div class="especs">${t.specs.map((sp,i)=>`<div class="espec"><div class="espec-h"><b>Próbka ${i+1}</b>${t.specs.length>1?`<button type="button" class="cx" data-endel="${i}" aria-label="Usuń próbkę ${i+1}">×</button>`:''}</div>
+      <div class="field"><label for="i_tests_en_specs_${i}_T">Temperatura [°C]</label>${inp(`tests.en.specs.${i}.T`,sp.T,'type="number" step="any" inputmode="decimal"')}</div>
+      <textarea id="i_tests_en_specs_${i}_txt" data-k="tests.en.specs.${i}.txt" spellcheck="false" aria-label="Dane próbki ${i+1}" placeholder="0;0&#10;50;12,4&#10;100;9,1">${esc(sp.txt)}</textarea></div>`).join('')}</div>
+    <div class="btns" style="margin-top:10px"><button class="sec" data-enadd="${t.specs.length?num(t.specs[t.specs.length-1].T)||5:5}:1">+ Dodaj próbkę</button></div>`}
+  if(k==='lep'){normLep(t);const L=LEP[t.m];$('#lepNorm').textContent=L.n;
+    el.innerHTML=`<div class="row"><div class="field" style="flex-basis:240px"><label for="i_lepm">Metoda</label><select id="i_lepm" data-k="tests.lep.m">
+      <option value="rot"${t.m==='rot'?' selected':''}>Dynamiczna, rotacyjna (PN-EN 13302)</option><option value="cap"${t.m==='cap'?' selected':''}>Dynamiczna, kapilarna (PN-EN 12596)</option><option value="kin"${t.m==='kin'?' selected':''}>Kinematyczna (PN-EN 12595)</option></select></div></div>
+      <div class="lsets">${t.sets.map((st,j)=>`<div class="lset">
+        <div class="inline"><div class="field" style="flex:0 1 150px"><label for="i_tests_lep_sets_${j}_T">Temperatura [°C]</label>${inp(`tests.lep.sets.${j}.T`,st.T,'type="number" step="any" inputmode="decimal"')}</div>
+          ${t.sets.length>1?`<button class="sec danger" data-deltemp="${j}">Usuń tę temperaturę</button>`:''}</div>
+        ${t.m==='rot'?`<div class="lbl" style="margin:8px 0 6px">Odczyty z aparatu [mPa·s]</div>${readsGrid(`lep.sets.${j}.reads`,st.reads,'Odczyt')}`:
+        `<div class="tbl" style="margin-top:8px"><table><thead><tr><th>Pomiar</th><th>${L.k}</th><th>Czas t [s]</th></tr></thead><tbody>${st.cap.map((r,i)=>`<tr><td>${i+1}</td><td>${inp(`tests.lep.sets.${j}.cap.${i}.0`,r[0],`type="number" step="any" inputmode="decimal" aria-label="Stała, ${st.T} °C, pomiar ${i+1}"`)}</td><td>${inp(`tests.lep.sets.${j}.cap.${i}.1`,r[1],`type="number" step="any" inputmode="decimal" aria-label="Czas, ${st.T} °C, pomiar ${i+1}"`)}</td></tr>`).join('')}</tbody></table></div>
+        <div class="btns" style="margin-top:10px"><button class="sec" data-addr="lep.sets.${j}.cap">+ Dodaj pomiar</button><button class="sec" data-delr="lep.sets.${j}.cap">− Usuń ostatni</button></div>`}
+      </div>`).join('')}</div>
+      <div class="btns" style="margin-top:12px"><button class="pri" data-addtemp style="padding:8px 14px;font-size:14px">+ Dodaj temperaturę</button><span class="note" style="margin:0">np. 90, 110 i 135 °C</span></div>
+      ${t.m!=='rot'?'<p class="note">Norma wymaga co najmniej dwóch pomiarów w każdej temperaturze. Nowy wiersz przejmuje stałą z poprzedniego.</p>':''}`}}
+function renderAllInputs(){KEYS.forEach(renderInputs)}
+document.addEventListener('click',e=>{const a=e.target.dataset.addr,d=e.target.dataset.delr;if(!cur||(!a&&!d))return;const p=a||d,k=p.split('.')[0],arr=getPath(cur.tests,p),isCap=p.endsWith('.cap');
+  if(a)arr.push(isCap?[arr.length?arr[arr.length-1][0]:'','']:'');else if(arr.length>MINR[p.replace(/\.\d+\./,'.*.')])arr.pop();
+  renderInputs(k);renderResults();save()});
+const TSUG=[90,110,135,150,160,60,120,180];
+document.addEventListener('click',e=>{if(!cur)return;const t=cur.tests.lep;
+  if(e.target.closest('[data-addtemp]')){normLep(t);const used=t.sets.map(x=>num(x.T)),nt=TSUG.find(v=>!used.includes(v));const last=t.sets[t.sets.length-1];
+    t.sets.push(newLepSet(nt!==undefined?String(nt):'',last?.cap?.[0]?.[0]||''));t.sets.sort((a,b)=>(num(a.T)||1e9)-(num(b.T)||1e9));save();renderInputs('lep');renderResults();return}
+  const dt=e.target.closest('[data-deltemp]');if(dt){if(!dt.dataset.arm){dt.dataset.arm='1';dt.textContent='Na pewno usunąć?';setTimeout(()=>{if(dt.isConnected){delete dt.dataset.arm;dt.textContent='Usuń tę temperaturę'}},3000);return}
+    t.sets.splice(+dt.dataset.deltemp,1);save();renderInputs('lep');renderResults()}});
+
+/* ----- wnioski ----- */
+// progi „praktycznie bez zmian” ≈ powtarzalność metod
+const SAME={pen:2,pik:1,ner:2,pi:0.2};
+const UNIT={pen:' ×0,1 mm',pik:' °C',ner:' pkt proc.',en:' J/cm²',pi:''};
+const EFFECT={
+  pen:[ 'lepiszcze jest bardziej miękkie','lepiszcze jest twardsze'],
+  pik:[ 'lepsza odporność na wysokie temperatury i koleinowanie','mniejsza odporność na wysokie temperatury'],
+  ner:[ 'lepsza sprężystość, typowa dla modyfikacji polimerem','słabsza sprężystość'],
+  en:[ 'większa kohezja lepiszcza','mniejsza kohezja lepiszcza'],
+  lep:[ 'może być potrzebna wyższa temperatura mieszania i zagęszczania','łatwiejsza urabialność w niższej temperaturze'],
+  pi:[ 'mniejsza wrażliwość na zmiany temperatury','większa wrażliwość na zmiany temperatury']};
+const lc=t=>t.charAt(0).toLowerCase()+t.slice(1);
+const NOM={pen:'Penetracja',pik:'Temperatura mięknienia PiK',ner:'Nawrót sprężysty',en:'Energia odkształcenia E′s',lep:'Lepkość',pi:'Indeks penetracji PI'};
+function conclusions(s,r,b,rb){const C=[],L=lims(s),g=gradeName(s),done=[],fail=[],skip=[],missing=[],bad=[],warn=[];
+  for(const k of KEYS){const x=r[k];if(x.status==='fail')fail.push(k);else if(x.status==='skip')skip.push(k);else if(x.val===undefined)missing.push(k);else{done.push(k);if(x.ok===false)warn.push(k)}}
+  // statusy
+  if(fail.length)C.push({c:'bad',t:`Do powtórzenia: ${fail.map(k=>lc(NOM[k])+(s.tests[k].why?` (${s.tests[k].why})`:'')).join(', ')}.`});
+  if(s.tests.en.st==='ok'&&(r.en.broken||r.en.incomplete))C.push({c:r.en.incomplete||r.en.val===undefined?'bad':'info',t:`Energia odkształcenia: ${r.en.broken?`kruche zerwanie kształtek: ${r.en.lost.map(x=>`nr ${x.n} w ${x.T} °C przy ${fmt(x.mx,0)} mm`).join(', ')}. `:''}${r.en.val===undefined?'Brak ważnego wyniku.':r.en.incomplete?`Wynik ${r.en.txt} jest wstępny: ${r.en.usedN} z 3 wymaganych ważnych oznaczeń.`:`Wynik ${r.en.txt} z 3 ważnych oznaczeń.`}`});
+  for(const k of warn.filter(k=>k==='pen'||k==='pik'))C.push({c:'bad',t:k==='pen'?'Penetracja: rozstęp oznaczeń przekracza dopuszczalny według PN-EN 1426. Wynik jest niepewny, zaleca się powtórzenie.':'Temperatura mięknienia: różnica między kulkami przekracza dopuszczalną według PN-EN 1427. Zaleca się powtórzenie.'});
+  // wymagania
+  if(g){const chk=expand(r).filter(it=>done.includes(it.k)&&it.k!=='pi').map(it=>{const[mn,mx,u]=L[it.k];return{k:it.k,it,ok:inRange(it.res.val,mn,mx),rq:rq(mn,mx,u)}}).filter(o=>o.ok!==null);
+    chk.filter(o=>!o.ok).forEach(o=>{if(!bad.includes(o.k))bad.push(o.k);C.push({c:'bad',t:`${o.it.nom} ${o.it.res.txt} nie spełnia wymagania ${o.rq} dla ${g}.`})});
+    if(chk.length&&!bad.length)C.push({c:'ok',t:`Wszystkie sprawdzone właściwości (${chk.map(o=>lc(o.it.nom)).join(', ')}) spełniają wymagania dla ${g}.`});
+    const noReq=done.filter(k=>!chk.some(o=>o.k===k));if(noReq.length)C.push({c:'info',t:`Bez wpisanego wymagania, więc bez oceny: ${noReq.map(k=>lc(NOM[k])).join(', ')}.`})}
+  if(g&&r.pi.val!==undefined&&L.pi[0]!==''){const ok=inRange(r.pi.val,L.pi[0],L.pi[1]);C.push({c:ok?'ok':'bad',t:`Indeks penetracji PI = ${fmt(r.pi.val,1)} ${ok?'mieści się':'nie mieści się'} w wymaganym zakresie od −1,5 do +0,7 dla ${g} (PN-EN 12591).`});if(!ok&&!bad.includes('pi'))bad.push('pi')}
+  // porównanie z bazową
+  if(b){const comp=expand(r).filter(it=>done.includes(it.k)||it.k==='pi').map(it=>({it,bk:baseFor(it,rb)})).filter(o=>o.bk&&delta(o.it.k,o.it.res,o.bk)!==null);let up=0,same=0;
+    for(const{it,bk}of comp){const k=it.k,A=it.res,d=delta(k,A,bk),bv=bk.val,NM=it.nom;let thr=SAME[k];if(k==='en')thr=Math.max(0.05,Math.abs(bv)*0.05);if(k==='lep')thr=Math.abs(bv)*0.03;
+      if(Math.abs(d)<=thr){same++;C.push({c:'base',t:`${NM} praktycznie bez zmian względem próbki bazowej ${label(b)} (${A.txt} wobec ${bk.txt}).`});continue}
+      const hi=d>0,pct=bv?Math.abs(d/bv*100):null,u=k==='lep'?' '+A.unit:UNIT[k];
+      const how=k==='pen'?(hi?'wyższa':'niższa'):k==='pik'?(hi?'wyższa':'niższa'):k==='ner'?(hi?'wyższy':'niższy'):k==='en'?(hi?'wyższa':'niższa'):k==='lep'?(hi?'wyższa':'niższa'):(hi?'wyższy':'niższy');
+      const eff=k==='pen'?EFFECT.pen[hi?0:1]:EFFECT[k][hi?0:1];if(k==='pik'||k==='ner'||k==='en'||k==='pi')up+=hi?1:-1;if(k==='pen')up+=hi?-1:1;
+      C.push({c:'base',t:`${NM} ${how} o ${fmt(Math.abs(d),DEC[k])}${u}${pct!==null&&k!=='pi'&&k!=='ner'?` (${fmt(pct,0)} %)`:''} niż w próbce bazowej ${label(b)}: ${eff}.`})}
+    if(comp.length>=3&&up>=3)C.push({c:'ok',t:`Zmiany względem próbki bazowej (twardsze lepiszcze, wyższa PiK, lepsze właściwości sprężyste) wskazują na skuteczną modyfikację.`});
+    if(!comp.length)C.push({c:'info',t:`Brak wspólnych wyników z próbką bazową ${label(b)}, więc nie ma czego porównać.`})}
+  else if(s.isBase){const ch=samples.filter(x=>x.baseId===s.id);C.push({c:'info',t:ch.length?`To próbka bazowa dla: ${ch.map(label).join(', ')}.`:'To próbka bazowa. Inne próbki mogą się do niej odnosić po wybraniu jej w „Porównanie z próbką bazową”.'})}
+  if(skip.length)C.push({c:'info',t:`Nie wykonywano: ${skip.map(k=>lc(NOM[k])).join(', ')}.`});
+  if(missing.length)C.push({c:'info',t:`Brak wyników: ${missing.map(k=>lc(NOM[k])).join(', ')}.`});
+  // ocena ogólna na początku
+  let v;if(!done.length)v='Brak wyników. Wpisz odczyty w badaniach powyżej.';
+  else if(fail.length||warn.length)v=`Ocena ogólna: badania niekompletne, ${fail.length+warn.length} do powtórzenia.`;
+  else if(bad.length)v=`Ocena ogólna: próbka nie spełnia wymagań dla ${g} (${bad.length} ${bad.length===1?'właściwość':'właściwości'}).`;
+  else if(g&&!missing.length)v=`Ocena ogólna: próbka spełnia wymagania dla ${g}.`;
+  else if(g)v=`Ocena ogólna: wykonane badania spełniają wymagania dla ${g}, brakuje jeszcze części wyników.`;
+  else v=`Wykonano ${done.length} z 5 badań.`;
+  C.unshift({c:'verdict',t:v});return C}
+
+document.addEventListener('click',e=>{if(!cur)return;const t=cur.tests.en;
+  const a=e.target.closest('[data-enadd]');if(a){normEn(t);const[T,n]=a.dataset.enadd.split(':');for(let k=0;k<(+n||1);k++)t.specs.push({T:String(+T),txt:''});save();renderInputs('en');renderResults();
+    const tas=document.querySelectorAll('#in-en textarea');tas[tas.length-(+n||1)]?.focus();return}
+  const d=e.target.closest('[data-endel]');if(d){if(!d.dataset.arm){d.dataset.arm='1';d.textContent='usuń?';d.style.fontSize='12px';setTimeout(()=>{if(d.isConnected){delete d.dataset.arm;d.textContent='×';d.style.fontSize=''}},3000);return}
+    t.specs.splice(+d.dataset.endel,1);save();renderInputs('en');renderResults()}});
+/* ----- badania: wyniki ----- */
+function renderBar(){const s=cur,b=byId(s.baseId);
+  $('#sampleBar').innerHTML=`<div>${s.code?`<div class="meta" style="font-family:var(--f-mono)">Nr ${esc(s.code)}</div>`:''}<div class="who">${esc(label(s))}${s.isBase?'<span class="tag">bazowa</span>':''}</div>
+    <div class="meta">${s.desc?esc(s.desc)+' · ':''}${s.isBase?'próbka bazowa':b?`porównanie z bazową <b>${esc(label(b))}</b>`:'bez próbki bazowej'}</div></div>
+    <div class="btns"><select id="swSample" aria-label="Przełącz próbkę" style="width:auto">${samples.map(o=>`<option value="${o.id}"${o.id===s.id?' selected':''}>${esc(label(o))}</option>`).join('')}</select><button class="sec" data-edit="${s.id}">Edytuj dane próbki</button><button class="sec" data-new>+ Nowa próbka</button></div>`}
+function renderResults(){if(!cur)return;renderBar();const s=cur,r=compute(s),b=byId(s.baseId),rb=b?compute(b):null,L=lims(s),g=gradeName(s);
+  for(const k of KEYS){const res=r[k];let h=res.html;
+    if(!res.status){const[mn,mx,u]=L[k],rr=rq(mn,mx,u),its=expand(r).filter(it=>it.k===k),multi=its.length>1;
+      if(rr!=='—')its.forEach(it=>{const ok=inRange(it.res.val,mn,mx);h+=`<div class="hint"><span>Wymaganie${g?' '+esc(g):''}${multi?' w '+esc(it.res.T)+' °C':''}: <b>${rr}</b></span>${it.res.val!==undefined?chip(ok,ok?'spełnia':'nie spełnia'):''}</div>`});
+      if(b)its.forEach(it=>{const bk=baseFor(it,rb),dd=delta(k,it.res,bk);h+=`<div class="hint base"><span>Bazowa ${esc(label(b))}${multi?' w '+esc(it.res.T)+' °C':''}: <b>${(multi?bk?.short:bk?.txt)||'brak wyniku'}</b></span>${dd!==null?`<span>Δ <b>${sgn(dd,DEC[k])}</b></span>`:''}</div>`})}
+    $('#out-'+k).innerHTML=h;$('#why-'+k).hidden=s.tests[k].st==='ok';
+    document.querySelector(`.tblock[data-t="${k}"]`).classList.toggle('is-fail',s.tests[k].st==='fail')}
+  // podsumowanie
+  const rows=expand(r).map(it=>{const k=it.k,res=it.res,[mn,mx,u]=L[k]||['','',''],ok=inRange(res.val,mn,mx),bk=baseFor(it,rb);
+    return{...it,res,req:rq(mn,mx,u),ok,bk,dd:rb?delta(k,res,bk):null,mn,mx}});
+  const hasReq=rows.some(x=>x.req!=='—');
+  $('#sumH').innerHTML=`<tr><th>Badanie</th><th>Wynik</th>${hasReq?'<th>Wymaganie</th>':''}<th>Ocena</th>${b?`<th>Bazowa ${esc(label(b))}</th><th>Δ</th>`:''}</tr>`;
+  const ocena=x=>!x.res.txt?'':x.res.status?chip(x.res.status==='fail'?false:null,x.res.status==='fail'?'do powtórzenia':'pominięte'):x.res.ok===false?chip(false,'powtórz'):x.ok===null?'':chip(x.ok,x.ok?'spełnia':'nie spełnia');
+  const dt=(x,r)=>(x.key.startsWith('lep@')&&r?.short)||r?.txt||'—';
+  $('#sumB').innerHTML=rows.map(x=>`<tr><td>${x.name}</td><td class="num">${dt(x,x.res)}</td>${hasReq?`<td class="num">${x.req}</td>`:''}<td>${ocena(x)}</td>${b?`<td class="num">${dt(x,x.bk)}</td><td class="num">${x.dd!==null?sgn(x.dd,DEC[x.k]):'—'}</td>`:''}</tr>`).join('');
+  const C=conclusions(s,r,b,rb);$('#concl').innerHTML=C.map(x=>`<li class="${x.c}"><span>${esc(x.t)}</span></li>`).join('');
+  $('#sumChart').innerHTML=bulletChart(rows.filter(x=>x.k!=='pi'&&x.res.val!==undefined).map(x=>({name:x.name,txt:x.res.txt,v:x.res.val,mn:num(x.mn),mx:num(x.mx),ok:x.ok,b:x.dd!==null?x.bk.val:null})));
+  const tx=x=>!x.res.txt?'':x.res.status==='fail'?'do powtórzenia':x.res.status?'pominięte':x.res.ok===false?'powtórz':x.ok===null?'':x.ok?'spełnia':'nie spełnia';
+  const meta=[['Nr próbki',s.code||'—'],['Nazwa próbki',label(s)+(s.isBase?' (bazowa)':'')],['Data badania',s.date||'—'],['Wykonał',s.who||'—'],...(g?[['Rodzaj asfaltu',g]]:[]),['Składniki',s.desc.trim()||'—']];
+  if(b)meta.push(['Próbka bazowa',`${label(b)}${b.desc?' · '+b.desc:''}`]);
+  $('#sumMeta').innerHTML=meta.map(([k,v])=>`<tr><th scope="row">${k}</th><td>${esc(v)}</td></tr>`).join('');
+  // tekst do schowka: kolumny rozdzielone tabulatorem, wkleja się jako tabela w Excelu i Wordzie
+  const head=['Badanie','Wynik',...(hasReq?['Wymaganie']:[]),'Ocena',...(b?[`Bazowa ${label(b)}`,'Δ']:[])];
+  sumText=[...meta.map(m=>m.join('\t')),'',head.join('\t'),...rows.map(x=>[x.name,dt(x,x.res),...(hasReq?[x.req]:[]),tx(x),...(b?[dt(x,x.bk),x.dd!==null?sgn(x.dd,DEC[x.k]):'—']:[])].join('\t')),'','Wnioski',...C.map(x=>'- '+x.t)].join('\n')}
+let sumText='';
+$('#copyBtn').addEventListener('click',()=>{const t=sumText,msg=$('#copyMsg');
+  const fb=()=>{const r=document.createRange();r.selectNodeContents($('#sumSheet'));const s=getSelection();s.removeAllRanges();s.addRange(r);msg.textContent='Tekst zaznaczony, skopiuj Ctrl+C.'};
+  try{navigator.clipboard.writeText(t).then(()=>msg.textContent='Skopiowano.',fb)}catch(e){fb()}});
+document.addEventListener('change',e=>{if(e.target.id==='swSample'){cur=byId(e.target.value);store.set('asf_last',cur.id);renderAllInputs();renderResults()}});
+
+/* ----- edycja pól (wspólna) ----- */
+function onEdit(e){const el=e.target,k=el.dataset.k;if(!k||!cur)return;const v=el.type==='checkbox'?el.checked:el.value;if(getPath(cur,k)===v)return;setPath(cur,k,v);
+  if(k==='tests.lep.m')renderInputs('lep');
+  if(k.endsWith('.st')){$('#why-'+k.split('.')[1]).hidden=v==='ok'}
+  if(view==='tests')renderResults();save()}
+document.addEventListener('input',onEdit);document.addEventListener('change',onEdit);
+
+/* ----- porównanie ----- */
+let cmpSel=null,cmpRef='';
+function renderCompare(){if(!samples.length){$('#cmpChips').innerHTML='<p class="note">Brak próbek do porównania.</p>';$('#cmpH').innerHTML='';$('#cmpB').innerHTML='';$('#cmpCharts').innerHTML='';return}
+  if(!cmpSel)cmpSel=new Set(samples.map(s=>s.id));[...cmpSel].forEach(id=>{if(!byId(id))cmpSel.delete(id)});
+  $('#cmpChips').innerHTML=samples.map(s=>`<label><input type="checkbox" data-cmp="${s.id}" ${cmpSel.has(s.id)?'checked':''}>${esc(label(s))}${s.isBase?'<span class="tag">bazowa</span>':''}</label>`).join('');
+  const sel=samples.filter(s=>cmpSel.has(s.id));
+  if(!sel.some(s=>s.id===cmpRef))cmpRef=(sel.find(s=>s.isBase)||sel[0]||{}).id||'';
+  $('#cmpRef').innerHTML=sel.map(s=>`<option value="${s.id}"${s.id===cmpRef?' selected':''}>${esc(label(s))}${s.isBase?' (bazowa)':''}</option>`).join('');
+  if(!sel.length){$('#cmpH').innerHTML='';$('#cmpB').innerHTML='<tr><td class="note">Zaznacz co najmniej jedną próbkę.</td></tr>';$('#cmpCharts').innerHTML='';return}
+  const R=Object.fromEntries(sel.map(s=>[s.id,compute(s)])),ref=R[cmpRef];
+  $('#cmpH').innerHTML=`<tr><th>Badanie</th>${sel.map(s=>`<th>${esc(label(s))}${s.id===cmpRef?'<span class="tag">odniesienie</span>':''}<span class="delta" style="text-transform:none;letter-spacing:0;font-weight:400">${esc(s.desc||'—')}</span></th>`).join('')}</tr>`;
+  // wiersze: wszystkie badania, lepkość osobno dla każdej temperatury występującej w zaznaczonych próbkach
+  const E=Object.fromEntries(sel.map(s=>[s.id,expand(R[s.id])]));const temps=[...new Set(sel.flatMap(s=>E[s.id].filter(it=>it.key.startsWith('lep@')).map(it=>num(it.res.T))))].sort((a,b)=>a-b);
+  const RW=[];for(const k of [...KEYS,'pi']){if(k==='lep'&&temps.length)temps.forEach(T=>RW.push({k,key:'lep@'+T,name:`Lepkość w ${fmt(T,T%1?1:0)} °C`}));else RW.push({k,key:k,name:NAMES[k]})}
+  const cell=(s,row)=>{const it=E[s.id].find(i=>i.key===row.key);if(it)return it.res;if(row.k==='lep'){const l=E[s.id].find(i=>i.key==='lep');if(l)return l.res}return{}};
+  $('#cmpB').innerHTML=RW.map(row=>`<tr><td>${row.name}</td>${sel.map(s=>{const x=cell(s,row),rf=cell({id:cmpRef},row),dd=s.id===cmpRef?null:delta(row.k,x,rf);
+    const st=x.status==='fail'?' style="color:var(--bad)"':'';return`<td class="num"${st}>${(row.key.startsWith('lep@')&&x.short)||x.txt||'—'}${dd!==null?`<span class="delta">Δ ${sgn(dd,DEC[row.k])}</span>`:''}</td>`}).join('')}</tr>`).join('');
+  $('#cmpPlus').innerHTML=cmpPlus(sel,R,E,RW,cell);$('#cmpLegend').innerHTML=legend(sel);
+  $('#cmpCharts').innerHTML=RW.map(row=>{const rows=sel.map(s=>{const c=cell(s,row);return{name:(s.id===cmpRef?'★ ':'')+label(s),v:c.val,miss:c.status==='fail'?'nie wyszło':c.status==='skip'?'nie wykonywano':'brak wyniku',ref:s.id===cmpRef,col:COL(sel.indexOf(s))}});
+    if(!rows.some(r=>r.v!==undefined))return'';return`<div class="card chartcard"><button class="sec chartcopy" data-copychart>Kopiuj wykres</button><h3>${row.name}</h3><div class="chart" style="margin-top:6px">${barsChart(rows,DEC[row.k])}</div></div>`}).join('')+
+    `<p class="note" style="grid-column:1/-1;margin:0">Kolory próbek są takie same jak w legendzie wykresów porównawczych, a gwiazdka ★ oznacza próbkę odniesienia. Przy próbkach bez wyniku zamiast słupka widać opis: „brak wyniku”, „nie wyszło” albo „nie wykonywano”.</p>`}
+/* ----- kopiowanie porównania do Worda ----- */
+// SVG → PNG z kolorami jasnego motywu (czytelny na białej kartce w Wordzie)
+const CSS_PROPS=['fill','stroke','stroke-width','stroke-dasharray','stroke-linecap','stroke-linejoin','opacity','fill-opacity','stroke-opacity','font-family','font-size','font-weight','text-anchor','dominant-baseline'];
+async function svgToPng(svg,scale=2){const r=svg.getBoundingClientRect(),vb=svg.viewBox.baseVal,W=vb&&vb.width?vb.width:r.width,H=vb&&vb.height?vb.height:r.height;
+  // kopia wykresu liczona w ukrytym kontenerze z jasnymi kolorami – widok programu się nie zmienia
+  const box=document.createElement('div');box.className='xl';box.style.cssText=`position:fixed;left:-10000px;top:0;width:${Math.max(1,r.width)}px;pointer-events:none`;
+  const wrap=document.createElement('div');wrap.className='chart';box.appendChild(wrap);const live=svg.cloneNode(true);wrap.appendChild(live);document.body.appendChild(box);
+  const clone=svg.cloneNode(true),src=[live,...live.querySelectorAll('*')],dst=[clone,...clone.querySelectorAll('*')];
+  src.forEach((el,i)=>{const cs=getComputedStyle(el);CSS_PROPS.forEach(pr=>{const v=cs.getPropertyValue(pr);if(v)dst[i].style.setProperty(pr,v)})});
+  box.remove();
+  clone.setAttribute('xmlns','http://www.w3.org/2000/svg');clone.setAttribute('width',W);clone.setAttribute('height',H);
+  const ref=document.getElementById('logo');if(clone.querySelector('use'))clone.insertAdjacentHTML('afterbegin',ref.outerHTML);
+  const url='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(clone));
+  const img=new Image();await new Promise((ok,no)=>{img.onload=ok;img.onerror=no;img.src=url});
+  const c=document.createElement('canvas');c.width=Math.round(W*scale);c.height=Math.round(H*scale);const g=c.getContext('2d');g.fillStyle='#ffffff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);
+  return{url:c.toDataURL('image/png'),w:Math.round(W),h:Math.round(H),canvas:c}}
+async function withLight(fn){return await fn()}
+function tableHtml(tbl){const rows=[...tbl.querySelectorAll('tr')].map(tr=>'<tr>'+[...tr.children].map(td=>{const tag=td.tagName.toLowerCase(),parts=[...td.childNodes].map(n=>n.textContent.trim()).filter(Boolean);
+  return`<${tag} style="border:1px solid #9aa39f;padding:4px 7px;font:${tag==='th'?'bold ':''}10pt Calibri,Arial,sans-serif;text-align:left;vertical-align:top;${tag==='th'?'background:#e6e9e7;':''}">${parts.map(esc).join('<br>')}</${tag}>`}).join('')+'</tr>').join('');
+  return`<table style="border-collapse:collapse;margin:6pt 0">${rows}</table>`}
+function legendText(card){const lg=card.querySelector('.legend');return lg?`<p style="font:9pt Calibri,Arial,sans-serif;color:#444;margin:2pt 0">${[...lg.children].map(x=>esc(x.textContent.trim())).join(' · ')}</p>`:''}
+async function chartBlock(card,maxW=600){const svg=card.querySelector('.chart svg');if(!svg)return'';const p=await svgToPng(svg);const w=Math.min(maxW,p.w*1.25),h=Math.round(p.h*w/p.w);
+  return`<p style="font:bold 11pt Calibri,Arial,sans-serif;margin:10pt 0 2pt">${esc(card.querySelector('h3')?.textContent||'')}</p>${legendText(card)}<img src="${p.url}" width="${Math.round(w)}" height="${h}" alt="${esc(card.querySelector('h3')?.textContent||'wykres')}">`}
+async function writeClip(html,text,png){const items={'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([text],{type:'text/plain'})};if(png)items['image/png']=png;
+  await navigator.clipboard.write([new ClipboardItem(items)])}
+// krótka informacja na samym przycisku zamiast osobnego komunikatu
+function flash(ok,el){if(!el)return;const t=el.dataset.label||el.textContent;el.dataset.label=t;el.textContent=ok?'Skopiowano ✓':'Nie udało się skopiować';setTimeout(()=>{el.textContent=t},1800)}
+async function copyAll(btn){btn.disabled=true;btn.textContent='Przygotowuję…';
+  try{const html=await withLight(async()=>{const sel=samples.filter(s=>cmpSel.has(s.id)),ref=byId(cmpRef);
+      let h=`<h2 style="font:bold 14pt Calibri,Arial,sans-serif">Porównanie próbek</h2><p style="font:10pt Calibri,Arial,sans-serif">Próbki: ${sel.map(x=>esc(label(x))).join(', ')}. Odniesienie: ${esc(label(ref))}.</p>`;
+      h+=tableHtml($('#cmpTableCard table'));h+='<p style="font:9pt Calibri,Arial,sans-serif;color:#444">Pod wynikiem podana jest różnica Δ względem próbki odniesienia.</p>';
+      for(const c of document.querySelectorAll('#cmpPlus .chartcard'))h+=await chartBlock(c);
+      h+=`<p style="font:bold 12pt Calibri,Arial,sans-serif;margin-top:14pt">Wyniki poszczególnych badań</p>`;
+      for(const c of document.querySelectorAll('#cmpCharts .chartcard'))h+=await chartBlock(c,420);
+      return`<html><body>${h}</body></html>`});
+    const text=[...$('#cmpTableCard table').querySelectorAll('tr')].map(tr=>[...tr.children].map(td=>td.innerText.replace(/\n/g,' ')).join('\t')).join('\n');
+    await writeClip(html,text);btn.disabled=false;btn.textContent='Kopiuj całe porównanie do Worda';flash(true,btn)}
+  catch(e){btn.disabled=false;btn.textContent='Kopiuj całe porównanie do Worda';flash(false,btn)}}
+document.addEventListener('click',async e=>{const t=e.target;
+  if(t.id==='cmpCopyAll'){copyAll(t);return}
+  if(t.dataset.copytable!==undefined){try{const tbl=$('#cmpTableCard table');const html=`<html><body>${tableHtml(tbl)}</body></html>`,text=[...tbl.querySelectorAll('tr')].map(tr=>[...tr.children].map(td=>td.innerText.replace(/\n/g,' ')).join('\t')).join('\n');
+    await writeClip(html,text);flash(true,t)}catch(err){flash(false,t)}return}
+  if(t.dataset.copychart!==undefined){const card=t.closest('.chartcard');try{let png,html;await withLight(async()=>{const p=await svgToPng(card.querySelector('.chart svg'));png=await new Promise(r=>p.canvas.toBlob(r,'image/png'));html=`<html><body>${await chartBlock(card)}</body></html>`});
+    await writeClip(html,card.querySelector('h3')?.textContent||'wykres',png).catch(async()=>{await navigator.clipboard.write([new ClipboardItem({'image/png':png})])});flash(true,t)}catch(err){flash(false,t)}}});
+
+/* ----- wykresy porównawcze ----- */
+const COL=i=>`var(--c${i%6+1})`;
+function legend(sel){return`<div class="legend">${sel.map((s,i)=>`<span><i style="background:${COL(i)}"></i>${esc(label(s))}${s.id===cmpRef?' <b>(odniesienie)</b>':''}</span>`).join('')}</div>`}
+function cmpPlus(sel,R,E,RW,cell){if(sel.length<1)return'';const out=[];
+  // 1. zmiana względem odniesienia [%]
+  if(sel.length>1){const ref=sel.find(s=>s.id===cmpRef),others=sel.filter(s=>s!==ref);
+    const groups=RW.filter(r=>r.k!=='pi').map(row=>{const rv=cell(ref,row);if(!(rv.val>0))return null;
+      // każda porównywana próbka ma swój wiersz; bez wyniku – opis zamiast słupka
+      const bars=others.map(s=>{const v=cell(s,row);if(v.val===undefined||(row.k==='lep'&&v.unit!==rv.unit))return{s,miss:v.status==='fail'?'nie wyszło':v.status==='skip'?'nie wykonywano':'brak wyniku'};return{s,p:(v.val-rv.val)/rv.val*100}});
+      return bars.some(b=>b.p!==undefined)?{row,bars}:null}).filter(Boolean);
+    if(groups.length){const W=700,LW=190,mid=LW+(W-LW)/2,half=(W-LW)/2-70,mx=Math.min(300,Math.max(10,...groups.flatMap(g=>g.bars.filter(b=>b.p!==undefined).map(b=>Math.abs(b.p))))),bh=14,gap=12,top=44,ri=sel.indexOf(ref);
+      let y=top,svg='';groups.forEach((g,gi)=>{const gh=g.bars.length*(bh+4);
+        if(gi%2===0)svg+=`<rect x="0" y="${y-5}" width="${W}" height="${gh+6}" rx="4" style="fill:var(--bg);opacity:.55"/>`;
+        svg+=`<text class="lbltxt" x="8" y="${y+gh/2+4}">${esc(g.row.name)}</text>`;
+        g.bars.forEach(b=>{const i=sel.indexOf(b.s);
+          if(b.p===undefined){svg+=`<line x1="${mid+6}" x2="${mid+28}" y1="${y+7}" y2="${y+7}" style="stroke:var(--muted);stroke-width:2;stroke-dasharray:4 3"/><text x="${mid+34}" y="${y+11}" style="font-style:italic;fill:${b.miss==='nie wyszło'?'var(--bad)':'var(--muted)'}">${esc(label(b.s))}: ${b.miss}</text>`;y+=bh+4;return}
+          const w=Math.max(1.5,Math.min(Math.abs(b.p),mx)/mx*half),x=b.p>=0?mid+2:mid-2-w;
+          svg+=`<rect x="${x}" y="${y}" width="${w}" height="${bh}" rx="2" style="fill:${COL(i)}"><title>${esc(label(b.s))}: ${sgn(b.p,1)} %</title></rect><text x="${b.p>=0?x+w+4:x-4}" y="${y+11}" text-anchor="${b.p>=0?'start':'end'}">${sgn(b.p,0)} %</text>`;y+=bh+4});y+=gap});
+      // wyraźna linia próbki odniesienia (0 %) w jej kolorze, z podpisem u góry i na dole
+      const bw=Math.min(W-20,Math.max(220,(label(ref).length+26)*7.6));
+      const base=`<line x1="${mid}" x2="${mid}" y1="${top-8}" y2="${y-gap+6}" style="stroke:${COL(ri)};stroke-width:3"/>
+        <rect x="${mid-bw/2}" y="2" width="${bw}" height="30" rx="15" style="fill:${COL(ri)}"/>
+        <text x="${mid}" y="22" text-anchor="middle" style="font:700 14px var(--f-body);fill:#1a1a1a">★ ${esc(label(ref))} · odniesienie · 0 %</text>
+        <text x="${mid}" y="${y+10}" text-anchor="middle" style="font:700 13px var(--f-mono);fill:${COL(ri)}">0 %</text>
+        <text x="${mid-12}" y="${y+28}" text-anchor="end" style="font:12px var(--f-body)">← niższy niż odniesienie</text><text x="${mid+12}" y="${y+28}" style="font:12px var(--f-body)">wyższy niż odniesienie →</text>`;
+      out.push(`<div class="card wide chartcard"><button class="sec chartcopy" data-copychart>Kopiuj wykres</button><h3>Zmiana względem odniesienia ${esc(label(ref))}</h3><p class="note" style="margin:0 0 8px">Środkowa linia to próbka odniesienia (0 %). Słupki pokazują, o ile procent wynik pozostałych próbek jest od niej wyższy albo niższy.</p>${legend(sel)}
+        <div class="chart"><svg viewBox="0 0 ${W} ${y+36}" role="img" aria-label="Zmiana względem odniesienia">${svg}${base}</svg></div></div>`)}}
+  // 2. profil właściwości (radar)
+  const axes=[];for(const row of RW){if(row.k==='pi')continue;if(row.k==='lep'&&axes.some(a=>a.k==='lep'))continue;
+    const vals=sel.map(s=>cell(s,row).val);if(vals.filter(v=>v>0).length>=Math.min(2,sel.length))axes.push({...row,vals,max:Math.max(...vals.filter(v=>v>0))})}
+  if(axes.length>=3&&sel.length>=1){const S=300,c=S/2,rad=100,ang=i=>-Math.PI/2+i*2*Math.PI/axes.length,pt=(i,f)=>[c+Math.cos(ang(i))*rad*f,c+Math.sin(ang(i))*rad*f];
+    let svg=[0.25,0.5,0.75,1].map(f=>`<polygon points="${axes.map((a,i)=>pt(i,f).join(',')).join(' ')}" fill="none" class="ax"/>`).join('');
+    svg+=axes.map((a,i)=>{const[x,y]=pt(i,1),[lx,ly]=pt(i,1.2);return`<line class="ax" x1="${c}" y1="${c}" x2="${x}" y2="${y}"/><text x="${lx}" y="${ly+4}" text-anchor="${Math.abs(lx-c)<10?'middle':lx>c?'start':'end'}">${esc(a.name.replace('Temperatura mięknienia ','').replace('Energia odkształcenia ','').replace('Nawrót sprężysty','Nawrót').replace(' w 25 °C',''))}</text>`}).join('');
+    sel.forEach((s,si)=>{if(!axes.some(a=>a.vals[si]>0))return;svg+=`<polygon points="${axes.map((a,i)=>pt(i,a.vals[si]>0?a.vals[si]/a.max:0).join(',')).join(' ')}" style="fill:${COL(si)};stroke:${COL(si)}" fill-opacity=".12" stroke-width="${s.id===cmpRef?3:2}"/>`});
+    out.push(`<div class="card chartcard"><button class="sec chartcopy" data-copychart>Kopiuj wykres</button><h3>Profil właściwości</h3><p class="note" style="margin:0 0 8px">Każda oś w skali od 0 do największego wyniku wśród zaznaczonych próbek.</p>${legend(sel)}<div class="chart" style="max-width:380px;margin-inline:auto"><svg viewBox="-70 -20 ${S+140} ${S+40}" role="img" aria-label="Profil właściwości">${svg}</svg></div></div>`)}
+  // 3. lepkość w funkcji temperatury
+  const lser=sel.map((s,i)=>({s,i,pts:(R[s.id].lep.sets||[]).map(st=>[num(st.T),st.val,st.unit]).filter(p=>isFinite(p[0])&&p[1]>0).sort((a,b)=>a[0]-b[0])})).filter(x=>x.pts.length);
+  if(lser.length&&lser.some(x=>x.pts.length>=2)){const all=lser.flatMap(x=>x.pts),W=420,H=230,Lm=58,B=34,T=14,Rr=12,x0=Math.min(...all.map(p=>p[0])),x1=Math.max(...all.map(p=>p[0])),pad=(x1-x0||10)*0.08;
+    const ly=all.map(p=>Math.log10(p[1])),y0=Math.floor(Math.min(...ly)),y1=Math.max(Math.ceil(Math.max(...ly)),y0+1),X=v=>Lm+(v-x0+pad)/(x1-x0+2*pad)*(W-Lm-Rr),Y=v=>H-B-(Math.log10(v)-y0)/(y1-y0)*(H-B-T);
+    const temps=[...new Set(all.map(p=>p[0]))];let svg='';for(let e=y0;e<=y1;e++){const v=Math.pow(10,e);svg+=`<line class="ax" x1="${Lm}" x2="${W-Rr}" y1="${Y(v)}" y2="${Y(v)}" opacity=".5"/><text x="${Lm-6}" y="${Y(v)+4}" text-anchor="end">${String(v).replace(/\B(?=(\d{3})+(?!\d))/g,' ')}</text>`}
+    svg+=temps.map(t=>`<text x="${X(t)}" y="${H-B+16}" text-anchor="middle">${fmt(t,t%1?1:0)}</text>`).join('');
+    lser.forEach(x=>{svg+=`<polyline points="${x.pts.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ')}" fill="none" style="stroke:${COL(x.i)}" stroke-width="${x.s.id===cmpRef?3:2}"/>`+x.pts.map(p=>`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="4" style="fill:${COL(x.i)}"><title>${esc(label(x.s))}: ${fmt(p[1],0)} ${p[2]} w ${p[0]} °C</title></circle>`).join('')});
+    out.push(`<div class="card chartcard"><button class="sec chartcopy" data-copychart>Kopiuj wykres</button><h3>Lepkość w funkcji temperatury</h3><p class="note" style="margin:0 0 8px">Oś pionowa w skali logarytmicznej (${esc(lser[0].pts[0][2])}).</p>${legend(sel)}<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Lepkość w funkcji temperatury"><line class="ax" x1="${Lm}" x2="${W-Rr}" y1="${H-B}" y2="${H-B}"/>${svg}<text x="${W-Rr}" y="${H-3}" text-anchor="end">temperatura [°C]</text></svg></div></div>`)}
+  // 4. krzywe siła–wydłużenie
+  const cser=sel.map((s,i)=>({s,i,p:R[s.id].en.curve,T:R[s.id].en.T})).filter(x=>x.p&&x.p.length>2);
+  if(cser.length){const all=cser.flatMap(x=>x.p),W=420,H=230,Lm=40,B=34,T=12,Rr=10,xm=Math.max(400,...all.map(p=>p[0])),ym=Math.max(...all.map(p=>p[1]))*1.1||1;
+    const X=v=>Lm+v/xm*(W-Lm-Rr),Y=v=>H-B-v/ym*(H-B-T);let svg=`<rect class="zone" x="${X(200)}" y="${T}" width="${X(400)-X(200)}" height="${H-B-T}"/>`;
+    svg+=niceTicks(0,ym,4).map(t=>`<line class="ax" x1="${Lm}" x2="${W-Rr}" y1="${Y(t)}" y2="${Y(t)}" opacity=".5"/><text x="${Lm-6}" y="${Y(t)+4}" text-anchor="end">${fmt(t,t%1?1:0)}</text>`).join('')+niceTicks(0,xm,4).map(t=>`<text x="${X(t)}" y="${H-B+16}" text-anchor="middle">${fmt(t,0)}</text>`).join('');
+    cser.forEach(x=>{svg+=`<polyline points="${x.p.map(q=>X(q[0]).toFixed(1)+','+Y(q[1]).toFixed(1)).join(' ')}" fill="none" style="stroke:${COL(x.i)}" stroke-width="${x.s.id===cmpRef?3:2}"><title>${esc(label(x.s))}</title></polyline>`});
+    out.push(`<div class="card chartcard"><button class="sec chartcopy" data-copychart>Kopiuj wykres</button><h3>Krzywe siła–wydłużenie</h3><p class="note" style="margin:0 0 8px">Pierwsza ważna próbka z badania energii odkształcenia każdej próbki. Pas 200–400 mm to zakres E′s.</p>${legend(sel)}<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Krzywe siła–wydłużenie"><line class="ax" x1="${Lm}" x2="${W-Rr}" y1="${H-B}" y2="${H-B}"/>${svg}<text x="${W-Rr}" y="${H-3}" text-anchor="end">wydłużenie [mm]</text><text x="${Lm}" y="${T}" dx="4">siła [N]</text></svg></div></div>`)}
+  return out.length?`<h2 style="margin:4px 0 0">Wykresy porównawcze</h2><div class="cmpgrid2">${out.join('')}</div>`:''}
+document.addEventListener('change',e=>{if(e.target.dataset.cmp){e.target.checked?cmpSel.add(e.target.dataset.cmp):cmpSel.delete(e.target.dataset.cmp);renderCompare()}
+  if(e.target.id==='cmpRef'){cmpRef=e.target.value;renderCompare()}});
+
+/* ----- podpowiedzi (?) – procedury w skrócie ----- */
+const HELP={
+ pen:['Penetracja · PN-EN 1426',['Przygotuj próbkę według PN-EN 12594: podgrzej i ujednorodnij, unikając przegrzania.','Wlej do naczynia na wysokość ok. 10 mm większą niż spodziewana penetracja.','Studź w temperaturze pokojowej (15–30 °C), a potem kondycjonuj w łaźni wodnej 25 °C przez czas podany w normie dla danej wysokości próbki.','Ustaw igłę tak, żeby dotykała powierzchni próbki. Obciążenie 100 g, czas 5 s.','Wykonaj co najmniej 3 oznaczenia w punktach oddalonych o ≥ 10 mm od ścianek i od siebie. Po każdym oczyść igłę.','Sprawdź rozstęp oznaczeń. Wynik to średnia zaokrąglona do liczby całkowitej (×0,1 mm).']],
+ pik:['Temperatura mięknienia PiK · PN-EN 1427',['Przygotuj próbkę według PN-EN 12594 i wlej ją do dwóch pierścieni na płytce pokrytej środkiem antyadhezyjnym (np. gliceryna z talkiem).','Ostudź w temperaturze pokojowej i zetnij nadmiar równo z pierścieniem.','Dobierz ciecz: woda (start 5 ± 1 °C) dla PiK do 80 °C, glicerol (start 30 ± 1 °C) powyżej 80 °C.','Kondycjonuj zestaw z kulkami w temperaturze początkowej przez czas podany w normie.','Ogrzewaj z szybkością 5 °C/min, mieszając ciecz.','Zanotuj temperaturę, w której każda kulka z otuliną asfaltu dotknie dolnej płytki.','Różnica kulek ≤ 1 °C (≤ 2 °C powyżej 80 °C). Wynik to średnia: do 0,2 °C poniżej 80 °C, do 0,5 °C powyżej.']],
+ ner:['Nawrót sprężysty · PN-EN 13398',['Napełnij co najmniej 2 formy duktylometru (podgrzanie form najwyżej do temperatury mięknienia, a gdy jest nieznana, do 70 °C).','Pozostaw ok. 1 h w temperaturze pokojowej i zetnij nadmiar podgrzanym nożem.','Kondycjonuj w łaźni w temperaturze badania (zwykle 25 °C, czasem 10 °C) przez 90 ± 10 min. Od napełnienia do rozciągania: 150 ± 10 min.','Rozciągaj z prędkością 50 ± 2,5 mm/min do wydłużenia L = 200 ± 1 mm (temperatura łaźni ± 0,5 °C).','W ciągu 10 s od zatrzymania przetnij nitkę nożyczkami w połowie.','Po 30 ± 1 min zmierz linijką odległość d między końcami połówek nitki [mm].','Oblicz R = d / L × 100 % dla każdej kształtki, wynik to średnia. Jeśli nitka zerwie się przed 200 mm (nie z powodu wady próbki), wpisz rzeczywiste L.']],
+ en:['Energia odkształcenia · PN-EN 13589',['Przygotuj materiał na 3 kształtki w formach duktylometru (praktycznie warto odlać więcej).','Pozostaw ok. 1 h w temperaturze pokojowej, potem kondycjonuj w łaźni w temperaturze badania przez 90 ± 10 min. Badanie wykonaj tego samego dnia.','Temperatura zwykle 5 °C (± 0,5 °C). Lepiszcza miękkie: 0 °C, twarde PMB: 10 °C lub 15 °C.','Rozciągaj z prędkością 50 ± 2,5 mm/min, rejestrując siłę i wydłużenie, do zerwania albo do 400 mm (1333 %).','Kruche zerwanie przed 400 mm: powtórz badanie na nowej kształtce. Jeśli druga też pęknie, podnieś temperaturę o 5 °C.','Wynik to średnia z 3 ważnych oznaczeń w jednej temperaturze: E′s = E′0,4 − E′0,2 [J/cm²], zaokrąglona do 0,01 J/cm² (poniżej 1) lub 0,1 J/cm² (od 1). W raporcie podaj temperaturę badania.']],
+ lep:['Lepkość · PN-EN 13302 / 12596 / 12595',['Wybierz metodę zgodną ze specyfikacją: rotacyjna (PN-EN 13302), kapilara próżniowa (PN-EN 12596) albo kinematyczna (PN-EN 12595).','Przygotuj próbkę według PN-EN 12594.','Rotacyjna: dobierz wrzeciono i prędkość tak, żeby moment obrotowy mieścił się w zakresie z normy. Kondycjonuj próbkę w temperaturze badania i odczytaj lepkość po ustabilizowaniu.','Kapilarna lub kinematyczna: umieść lepkościomierz w łaźni o temperaturze badania, zmierz czas przepływu między znacznikami i pomnóż go przez stałą lepkościomierza (K lub C).','Wykonaj co najmniej dwa pomiary w każdej temperaturze. Dla kilku temperatur (np. 90, 110 i 135 °C) dodaj kolejne bloki.','Porównaj rozrzut z powtarzalnością podaną w normie.']]};
+function fillHelp(){document.querySelectorAll('.help').forEach(h=>{const[t,steps]=HELP[h.dataset.help];h.querySelector('.tip').innerHTML=`<b class="th">${t}</b><ol>${steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol><span class="tn">Skrót procedury. Wiążący jest pełny tekst normy, którą macie w laboratorium.</span>`})}
+document.addEventListener('click',e=>{const b=e.target.closest('.helpbtn');document.querySelectorAll('.help.open').forEach(h=>{if(!b||h!==b.parentElement)h.classList.remove('open')});if(b)b.parentElement.classList.toggle('open')});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.help.open').forEach(h=>h.classList.remove('open'))});
+
+/* ----- notes ----- */
+let notes=store.get('asf_notes',[]),noteCur=null,noteQ='';
+const saveNotes=()=>store.set('asf_notes',notes);
+function renderNotes(){if(!noteCur&&notes.length)noteCur=notes[0].id;const q=noteQ.toLowerCase(),list=notes.filter(n=>!q||(n.title+' '+n.text).toLowerCase().includes(q));
+  $('#noteList').innerHTML=list.length?list.map(n=>{const smp=byId(n.sampleId);return`<button class="nitem${n.id===noteCur?' on':''}" data-note="${n.id}"><b>${esc(n.title||'Bez tytułu')}</b><span>${esc(n.date)}${smp?' · '+esc(label(smp)):''}</span></button>`}).join(''):`<p class="note">${notes.length?'Brak notatek pasujących do wyszukiwania.':'Nie masz jeszcze notatek. Kliknij „+ Nowa notatka”.'}</p>`;
+  renderNoteEd()}
+function renderNoteEd(){const n=notes.find(x=>x.id===noteCur);
+  if(!n){$('#noteEd').innerHTML='<p class="note" style="margin:0">Wybierz notatkę z listy albo dodaj nową.</p>';return}
+  $('#noteEd').innerHTML=`<div class="row"><div class="field" style="flex-basis:260px"><label for="noteTitle">Tytuł</label><input id="noteTitle" data-n="title" value="${esc(n.title)}" placeholder="np. Uwagi do badania PiK" style="font-family:var(--f-body)"></div>
+    <div class="field"><label for="noteSmp">Dotyczy próbki</label><select id="noteSmp" data-n="sampleId" style="font-family:var(--f-body)"><option value="">— ogólna —</option>${samples.map(x=>`<option value="${x.id}"${n.sampleId===x.id?' selected':''}>${esc(label(x))}</option>`).join('')}</select></div></div>
+    <div class="field"><label for="noteText">Treść</label><textarea id="noteText" data-n="text" placeholder="Wpisz notatkę…">${esc(n.text)}</textarea></div>
+    <div class="btns" style="margin-top:12px;justify-content:space-between"><span class="note" style="margin:0" id="noteSaved">Zapisuje się automatycznie · ${esc(n.date)}</span><button class="sec danger" id="noteDel">Usuń notatkę</button></div>`}
+document.addEventListener('input',e=>{const k=e.target.dataset.n;if(k){const n=notes.find(x=>x.id===noteCur);if(!n)return;n[k]=e.target.value;n.date=new Date().toLocaleString('pl-PL',{dateStyle:'short',timeStyle:'short'});saveNotes();
+    const it=document.querySelector(`[data-note="${n.id}"]`);if(it){const smp=byId(n.sampleId);it.innerHTML=`<b>${esc(n.title||'Bez tytułu')}</b><span>${esc(n.date)}${smp?' · '+esc(label(smp)):''}</span>`}}
+  if(e.target.id==='noteSearch'){noteQ=e.target.value;renderNotes()}});
+document.addEventListener('change',e=>{if(e.target.dataset.n==='sampleId')renderNotes()});
+document.addEventListener('click',e=>{if(e.target.id==='noteNew'){const n={id:uid(),title:'',text:'',sampleId:view==='notes'&&cur?cur.id:'',date:new Date().toLocaleString('pl-PL',{dateStyle:'short',timeStyle:'short'})};notes.unshift(n);noteCur=n.id;saveNotes();renderNotes();$('#noteTitle').focus();return}
+  const it=e.target.closest('[data-note]');if(it){noteCur=it.dataset.note;renderNotes();return}
+  if(e.target.id==='noteDel'){const b=e.target;if(!b.dataset.arm){b.dataset.arm='1';b.textContent='Na pewno usunąć?';setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.textContent='Usuń notatkę'}},3000);return}
+    notes=notes.filter(x=>x.id!==noteCur);noteCur=notes[0]?.id||null;saveNotes();renderNotes()}});
+
+/* ----- kalkulator ----- */
+let cHist=[];
+function cEval(src){const ex=String(src).replace(/,/g,'.').replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/\^/g,'**').replace(/(\d+(?:\.\d+)?)%/g,'($1/100)').replace(/√\(/g,'Math.sqrt(').replace(/√(\d+(?:\.\d+)?)/g,'Math.sqrt($1)');
+  if(!/^[\d+\-*/().\s]*$/.test(ex.replace(/Math\.sqrt/g,'')))return NaN;if(!ex.trim())return NaN;try{const v=Function('"use strict";return('+ex+')')();return typeof v==='number'?v:NaN}catch(e){return NaN}}
+const fmtC=v=>isFinite(v)?String(+v.toPrecision(12)).replace('.',','):'';
+/* ----- notka obliczeniowa (zapis matematyczny MathML) ----- */
+const f2=(x,d=2)=>fmtN(x,d)||'—';
+// pomocnicze MathML
+const mi=v=>`<mi>${v}</mi>`,mn=v=>`<mn>${typeof v==='number'?f2(v,3):v}</mn>`,mo=v=>`<mo>${v}</mo>`,mt=v=>`<mtext>${v}</mtext>`,rw=(...a)=>`<mrow>${a.join('')}</mrow>`;
+const fr=(a,b)=>`<mfrac>${rw(a)}${rw(b)}</mfrac>`,sb=(a,b)=>`<msub>${rw(a)}${rw(b)}</msub>`,bar=a=>`<mrow style="border-top:0.075em solid currentColor;padding-top:0.06em">${a}</mrow>`;
+const un=u=>`<mspace width="0.3em"/>${mt(u)}`,sumOf=(arr,d=3)=>arr.map(v=>mn(f2(v,d))).join(mo('+')),eqs=(...a)=>a.join(mo('='));
+const abs=a=>rw(mo('|'),a,mo('|'));
+const ep=x=>`<msubsup><mi>E</mi>${rw(x)}<mo>′</mo></msubsup>`,epBar=x=>`<msubsup>${bar(mi('E'))}${rw(x)}<mo>′</mo></msubsup>`,DL=`<mi mathvariant="normal">Δ</mi>`;
+function calcNoteData(s){const T=s.tests,r=compute(s),S=[];
+  const st=k=>T[k].st!=='ok'?[{p:`Badanie oznaczone jako „${T[k].st==='fail'?'nie wyszło, do powtórzenia':'nie wykonywano'}”${T[k].why?` (powód: ${T[k].why})`:''}. Wynik nie jest wyznaczany.`}]:null;
+  // penetracja
+  {const t='Penetracja · PN-EN 1426',L=st('pen');if(L)S.push({t,i:L});else{const v=T.pen.reads.map(num).filter(isFinite);
+    if(v.length<3)S.push({t,i:[{p:'Za mało oznaczeń: norma wymaga co najmniej trzech ważnych.'}]});else{const m=mean(v),mx=Math.max(...v),mnv=Math.min(...v),rg=mx-mnv,lim=penLimit(m);
+    S.push({t,i:[{p:`Dane: ${v.map((x,i)=>`P${'₁₂₃₄₅₆₇₈₉'[i]||i+1} = ${f2(x,1)}`).join(', ')} [×0,1 mm], n = ${v.length}.`},
+      {m:eqs(bar(mi('P')),fr(rw('<munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover>',sb(mi('P'),mi('i'))),mi('n')),fr(sumOf(v,1),mn(v.length)),rw(mn(f2(m,2)),un('×0,1 mm'))),t:`P̄ = ΣPi / n = (${v.map(x=>f2(x,1)).join(' + ')}) / ${v.length} = ${f2(m,2)} ×0,1 mm`},
+      {m:eqs(mi('R'),rw(sb(mi('P'),mt('max')),mo('−'),sb(mi('P'),mt('min'))),rw(mn(f2(mx,1)),mo('−'),mn(f2(mnv,1))),rw(mn(f2(rg,1)),un('×0,1 mm')))+mo(rg<=lim?'≤':'>')+rw(mn(lim),un('×0,1 mm')),t:`R = Pmax − Pmin = ${f2(mx,1)} − ${f2(mnv,1)} = ${f2(rg,1)} ×0,1 mm ${rg<=lim?'≤':'>'} ${lim} ×0,1 mm`},
+      {p:`Rozstęp ${rg<=lim?'mieści się w dopuszczalnym, oznaczenia są ważne':'przekracza dopuszczalny, badanie należy powtórzyć'}. Wynik po zaokrągleniu do liczby całkowitej: P = ${Math.round(m)} ×0,1 mm.`}]})}}}
+  // PiK
+  {const t='Temperatura mięknienia PiK · PN-EN 1427',L=st('pik');if(L)S.push({t,i:L});else{const a=num(T.pik.a),b=num(T.pik.b);
+    if(!isFinite(a)||!isFinite(b))S.push({t,i:[{p:'Brak temperatur obu kulek.'}]});else{const m=(a+b)/2,hi=m>=80,d=Math.abs(a-b),lim=hi?2:1;
+    S.push({t,i:[{p:`Dane: ciecz w łaźni: ${T.pik.med==='g'?'glicerol':'woda'}; T₁ = ${f2(a,1)} °C, T₂ = ${f2(b,1)} °C.`},
+      {m:eqs(bar(mi('T')),fr(rw(sb(mi('T'),mn(1)),mo('+'),sb(mi('T'),mn(2))),mn(2)),fr(rw(mn(f2(a,1)),mo('+'),mn(f2(b,1))),mn(2)),rw(mn(f2(m,2)),un('°C'))),t:`T̄ = (T1 + T2) / 2 = (${f2(a,1)} + ${f2(b,1)}) / 2 = ${f2(m,2)} °C`},
+      {m:eqs(rw(DL,mi('T')),abs(rw(sb(mi('T'),mn(1)),mo('−'),sb(mi('T'),mn(2)))),rw(mn(f2(d,1)),un('°C')))+mo(d<=lim?'≤':'>')+rw(mn(lim),un('°C')),t:`ΔT = |T1 − T2| = ${f2(d,1)} °C ${d<=lim?'≤':'>'} ${lim} °C`},
+      {p:`Różnica ${d<=lim?'mieści się w dopuszczalnej':'przekracza dopuszczalną, badanie należy powtórzyć'}. Wynik po zaokrągleniu do ${hi?'0,5':'0,2'} °C: PiK = ${f2(roundTo(m,hi?0.5:0.2),1)} °C.`}]})}}}
+  // nawrót
+  {const t='Nawrót sprężysty · PN-EN 13398',L=st('ner');if(L)S.push({t,i:L});else{const v=T.ner.reads.map(num).filter(isFinite),Ll=num(T.ner.L);
+    if(!v.length||!(Ll>0))S.push({t,i:[{p:'Brak odczytów d.'}]});else{const rs=v.map(d=>d/Ll*100),m=mean(rs);
+    S.push({t,i:[{p:`Dane: temperatura badania ${T.ner.T} °C, wydłużenie L = ${f2(Ll,0)} mm, odległości końców połówek po 30 min: ${v.map((d,i)=>`d${'₁₂₃₄₅'[i]||i+1} = ${f2(d,1)} mm`).join(', ')}.`},
+      {m:eqs(sb(mi('R'),rw(mi('E'),mo(','),mi('i'))),rw(fr(sb(mi('d'),mi('i')),mi('L')),mo('·'),mn(100),un('%'))),t:'RE,i = di / L · 100 %'},
+      ...v.map((d,i)=>({m:eqs(sb(mi('R'),rw(mi('E'),mo(','),mn(i+1))),rw(fr(rw(mn(f2(d,1)),un('mm')),rw(mn(f2(Ll,0)),un('mm'))),mo('·'),mn(100),un('%')),rw(mn(f2(rs[i],2)),un('%'))),t:`RE,${i+1} = ${f2(d,1)} mm / ${f2(Ll,0)} mm · 100 % = ${f2(rs[i],2)} %`})),
+      {m:eqs(sb(bar(mi('R')),mi('E')),fr(sumOf(rs,2),mn(rs.length)),rw(mn(f2(m,2)),un('%'))),t:`R̄E = (${rs.map(x=>f2(x,2)).join(' + ')}) / ${rs.length} = ${f2(m,2)} %`},
+      {p:`Wynik po zaokrągleniu do 1 %: RE = ${Math.round(m)} %.`}]})}}}
+  // energia
+  {const t='Energia odkształcenia · PN-EN 13589',L=st('en');if(L)S.push({t,i:L});else{normEn(T.en);const A=num(T.en.A),it=[];
+    it.push({p:`Dane: przekrój początkowy kształtki A = ${f2(A,2)} cm²; pary (wydłużenie x [mm], siła F [N]) z rejestracji aparatu.`});
+    it.push({m:eqs(sb(mi('E'),mi('x')),rw('<msubsup><mo>∫</mo><mn>0</mn><mi>x</mi></msubsup>',mi('F'),mi('d'),mi('x')))+mo('≈')+rw('<munder><mo>∑</mo><mi>i</mi></munder>',fr(rw(sb(mi('F'),mi('i')),mo('+'),sb(mi('F'),rw(mi('i'),mo('+'),mn(1)))),mn(2)),mo('·'),rw(mo('('),sb(mi('x'),rw(mi('i'),mo('+'),mn(1))),mo('−'),sb(mi('x'),mi('i')),mo(')'))),t:'Ex = ∫0..x F dx ≈ Σ (Fi + Fi+1) / 2 · (xi+1 − xi)'});
+    it.push({m:eqs(ep(mi('x')),fr(sb(mi('E'),mi('x')),mi('A')))+mt(',&#8195;')+eqs(ep(mi('s')),rw(ep(mn('0,4')),mo('−'),ep(mn('0,2')))),t:"E′x = Ex / A,  E′s = E′0,4 − E′0,2"});
+    T.en.specs.forEach((sp,i)=>{const pp=parsePts(sp.txt),k=i+1;if(pp.length<3){it.push({p:`Kształtka ${k} (${sp.T} °C): brak danych.`});return}
+      const e2=energyTo(pp,200),e4=energyTo(pp,400),mx=pp[pp.length-1][0];
+      if(e4===null){it.push({p:`Kształtka ${k} (${sp.T} °C): zerwana przy x = ${f2(mx,0)} mm < 400 mm, stracona, nie wchodzi do wyniku.`});return}
+      it.push({p:`Kształtka ${k} (${sp.T} °C):`});
+      it.push({m:eqs(ep(mn('0,2')),fr(rw(mn(f2(e2*1000,1)),un('N·mm')),rw(mn(f2(A,2)),un('cm²'))),fr(rw(mn(f2(e2,4)),un('J')),rw(mn(f2(A,2)),un('cm²'))),rw(mn(f2(e2/A,3)),un('J/cm²'))),t:`E′0,2 = ${f2(e2*1000,1)} N·mm / ${f2(A,2)} cm² = ${f2(e2/A,3)} J/cm²`});
+      it.push({m:eqs(ep(mn('0,4')),fr(rw(mn(f2(e4*1000,1)),un('N·mm')),rw(mn(f2(A,2)),un('cm²'))),fr(rw(mn(f2(e4,4)),un('J')),rw(mn(f2(A,2)),un('cm²'))),rw(mn(f2(e4/A,3)),un('J/cm²'))),t:`E′0,4 = ${f2(e4*1000,1)} N·mm / ${f2(A,2)} cm² = ${f2(e4/A,3)} J/cm²`});
+      it.push({m:eqs(ep(rw(mi('s'),mo(','),mn(k))),rw(mn(f2(e4/A,3)),mo('−'),mn(f2(e2/A,3))),rw(mn(f2((e4-e2)/A,3)),un('J/cm²'))),t:`E′s,${k} = ${f2(e4/A,3)} − ${f2(e2/A,3)} = ${f2((e4-e2)/A,3)} J/cm²`})});
+    if(r.en.val!==undefined){const g=T.en.specs.map(sp=>({sp,p:parsePts(sp.txt)})).filter(o=>num(o.sp.T)===r.en.T&&o.p.length>=3&&energyTo(o.p,400)!==null).map(o=>(energyTo(o.p,400)-energyTo(o.p,200))/A);
+      it.push({m:eqs(epBar(mi('s')),fr(sumOf(g,3),mn(g.length)),rw(mn(f2(r.en.val,3)),un('J/cm²'))),t:`Ē′s = (${g.map(x=>f2(x,3)).join(' + ')}) / ${g.length} = ${f2(r.en.val,3)} J/cm²`});
+      it.push({p:`Wynik po zaokrągleniu (do 0,01 J/cm² poniżej 1, do 0,1 J/cm² od 1): E′s = ${r.en.txt}${r.en.incomplete?`. Wynik wstępny: ${r.en.usedN} z 3 wymaganych ważnych oznaczeń.`:', średnia z 3 ważnych oznaczeń.'}`})}
+    else it.push({p:'Brak ważnego wyniku: żadna kształtka nie osiągnęła 400 mm.'});
+    S.push({t,i:it})}}
+  // lepkość
+  {const t='Lepkość',L=st('lep');if(L)S.push({t,i:L});else{normLep(T.lep);const m=T.lep.m,LE=LEP[m],sy=m==='kin'?'ν':'η',it=[{p:`Metoda: ${LE.n}.`}];
+    if(m!=='rot')it.push({m:eqs(sb(mi(sy),mi('i')),rw(mi(m==='cap'?'K':'C'),mo('·'),sb(mi('t'),mi('i')))),t:`${sy}i = ${m==='cap'?'K':'C'} · ti`});
+    T.lep.sets.forEach(set=>{let vals;
+      if(m==='rot')vals=set.reads.map(num).filter(isFinite);else{const pr=set.cap.map(([K,x])=>[num(K),num(x)]).filter(([K,x])=>isFinite(K)&&isFinite(x));vals=pr.map(([K,x])=>K*x);
+        if(pr.length)it.push({p:`${set.T} °C:`});pr.forEach(([K,x],i)=>it.push({m:eqs(sb(mi(sy),mn(i+1)),rw(mn(f2(K,4)),mo('·'),mn(f2(x,1)),un('s')),rw(mn(f2(K*x,2)),un(LE.u))),t:`${sy}${i+1} = ${f2(K,4)} · ${f2(x,1)} s = ${f2(K*x,2)} ${LE.u}`}))}
+      if(!vals.length){it.push({p:`${set.T} °C: brak pomiarów.`});return}
+      const a=mean(vals),sp=vals.length>1?(Math.max(...vals)-Math.min(...vals))/a*100:0;
+      if(m==='rot')it.push({p:`${set.T} °C: odczyty ${vals.map((x,i)=>`${sy}${'₁₂₃₄₅'[i]||i+1} = ${f2(x,1)} mPa·s`).join(', ')}.`});
+      it.push({m:eqs(sb(bar(mi(sy)),rw(mn(set.T),mt('&#8239;°C'))),fr(sumOf(vals,2),mn(vals.length)),rw(mn(f2(a,2)),un(LE.u)))+(m==='rot'?mo('=')+rw(mn(f2(a/1000,4)),un('Pa·s')):''),t:`${sy}̄(${set.T} °C) = (${vals.map(x=>f2(x,2)).join(' + ')}) / ${vals.length} = ${f2(a,2)} ${LE.u}`});
+      if(vals.length>1)it.push({m:eqs(mi('w'),rw(fr(rw(sb(mi(sy),mt('max')),mo('−'),sb(mi(sy),mt('min'))),bar(mi(sy))),mo('·'),mn(100),un('%')),rw(mn(f2(sp,1)),un('%'))),t:`w = (${sy}max − ${sy}min) / ${sy}̄ · 100 % = ${f2(sp,1)} %`})});
+    S.push({t,i:it})}}
+  // PI
+  if(r.pi.val!==undefined){const P=r.pen.val,Tr=r.pik.val,l=Math.log10(P),lg=rw(mi('log'),mo('&#8289;'),mi('P'));
+    S.push({t:'Indeks penetracji PI · PN-EN 12591, załącznik A',i:[{p:`Dane: P = ${P} ×0,1 mm, PiK = ${f2(Tr,1)} °C, log P = ${f2(l,4)}.`},
+      {m:eqs(mi('PI'),fr(rw(mn(20),mo('·'),sb(mi('T'),mt('PiK')),mo('+'),mn(500),mo('·'),lg,mo('−'),mn(1952)),rw(sb(mi('T'),mt('PiK')),mo('−'),mn(50),mo('·'),lg,mo('+'),mn(120)))),t:'PI = (20 · TPiK + 500 · log P − 1952) / (TPiK − 50 · log P + 120)'},
+      {m:eqs(mi('PI'),fr(rw(mn(20),mo('·'),mn(f2(Tr,1)),mo('+'),mn(500),mo('·'),mn(f2(l,4)),mo('−'),mn(1952)),rw(mn(f2(Tr,1)),mo('−'),mn(50),mo('·'),mn(f2(l,4)),mo('+'),mn(120))),fr(mn(f2(20*Tr+500*l-1952,2)),mn(f2(Tr-50*l+120,2))),mn(f2(r.pi.val,2))),t:`PI = (20 · ${f2(Tr,1)} + 500 · ${f2(l,4)} − 1952) / (${f2(Tr,1)} − 50 · ${f2(l,4)} + 120) = ${f2(r.pi.val,2)}`}]})}
+  // porównanie z bazową
+  const b=byId(s.baseId);if(b){const rb=compute(b),it=[{m:eqs(rw(DL,mi('x')),rw(mi('x'),mo('−'),sb(mi('x'),mi('b'))))+mt(',&#8195;')+eqs(mi('δ'),rw(fr(rw(DL,mi('x')),sb(mi('x'),mi('b'))),mo('·'),mn(100),un('%'))),t:'Δx = x − xb,  δ = Δx / xb · 100 %'}];
+    expand(r).forEach(e=>{const bk=baseFor(e,rb),d=delta(e.k,e.res,bk);if(d===null)return;
+      it.push({p:`${e.name}:`},{m:eqs(rw(DL,mi('x')),rw(mn(f2(e.res.val,3)),mo('−'),mn(f2(bk.val,3))),mn(sgn(d,DEC[e.k])))+(bk.val?mt(',&#8195;')+eqs(mi('δ'),rw(fr(mn(sgn(d,DEC[e.k])),mn(f2(bk.val,3))),mo('·'),mn(100),un('%')),rw(mn(sgn(d/bk.val*100,1)),un('%'))):''),t:`${e.name}: Δ = ${f2(e.res.val,3)} − ${f2(bk.val,3)} = ${sgn(d,DEC[e.k])}${bk.val?`, δ = ${sgn(d/bk.val*100,1)} %`:''}`})});
+    if(it.length>1)S.push({t:`Porównanie z próbką bazową ${label(b)}`,i:it})}
+  return S}
+function renderCalcNote(){const sel=$('#cnSample');if(!samples.length){sel.innerHTML='';$('#cnBody').innerHTML='<p class="note">Brak próbek.</p>';return}
+  const want=sel.value&&byId(sel.value)?sel.value:(cur||samples[samples.length-1]).id;
+  sel.innerHTML=samples.map(x=>`<option value="${x.id}"${x.id===want?' selected':''}>${esc(label(x))}</option>`).join('');
+  const s=byId(want),S=calcNoteData(s);let n=0;
+  $('#cnBody').innerHTML=`<p class="note" style="margin:6px 0 12px">Próbka: <b>${esc(label(s))}</b>${s.code?' · nr '+esc(s.code):''} · ${esc(s.date||'')}${s.desc?' · '+esc(s.desc):''}</p>`+
+    S.map((x,i)=>`<div class="nsec"><h3>${i+1}. ${esc(x.t)}</h3>${x.i.map(o=>o.m?`<div class="eqrow"><div class="eq"><math display="block">${o.m}</math></div><span class="eqn">(${++n})</span></div>`:`<p class="np">${esc(o.p)}</p>`).join('')}</div>`).join('');
+  n=0;calcNoteText=[`NOTKA OBLICZENIOWA – ${label(s)}${s.code?' (nr '+s.code+')':''}, ${s.date||''}`,s.desc?`Skład: ${s.desc}`:'',''].concat(S.flatMap((x,i)=>[`${i+1}. ${x.t}`,...x.i.map(o=>o.m?`   ${o.t}   (${++n})`:'   '+o.p),''])).filter((l,i)=>l!==''||i>1).join('\n')}
+let calcNoteText='';
+document.addEventListener('change',e=>{if(e.target.id==='cnSample')renderCalcNote()});
+document.addEventListener('click',e=>{if(e.target.id!=='cnCopy')return;const msg=$('#cnMsg');
+  const fb=()=>{const r=document.createRange();r.selectNodeContents($('#cnBody'));const g=getSelection();g.removeAllRanges();g.addRange(r);msg.textContent='Tekst zaznaczony, skopiuj Ctrl+C.'};
+  try{navigator.clipboard.writeText(calcNoteText).then(()=>msg.textContent='Skopiowano notkę.',fb)}catch(err){fb()}});
+function renderCalc(){if(!$('#cKeys').children.length){$('#cKeys').innerHTML=['C','(',')','÷','7','8','9','×','4','5','6','−','1','2','3','+','0',',','√','='].map(k=>`<button type="button" class="${'÷×−+'.includes(k)?'op':k==='='?'eq':''}" data-ck="${k}">${k}</button>`).join('')}calcLive();dozCalc();unitCalc()}
+function calcLive(){const v=cEval($('#cDisp').value);$('#cRes').textContent=isFinite(v)?'= '+fmtC(v):' '}
+document.addEventListener('click',e=>{const k=e.target.dataset.ck;if(!k)return;const d=$('#cDisp');
+  if(k==='C')d.value='';else if(k==='='){const v=cEval(d.value);if(isFinite(v)){cHist.unshift(`${d.value} = ${fmtC(v)}`);cHist=cHist.slice(0,5);d.value=fmtC(v);$('#cHist').innerHTML=cHist.map(esc).join('<br>')}}
+  else d.value+=k==='√'?'√(':k;calcLive();d.focus()});
+document.addEventListener('input',e=>{if(e.target.id==='cDisp')calcLive();if(['dzMass','dzPct','dzMode'].includes(e.target.id))dozCalc();if(['uVal','uFrom'].includes(e.target.id))unitCalc()});
+document.addEventListener('change',e=>{if(e.target.id==='dzMode')dozCalc();if(e.target.id==='uFrom')unitCalc()});
+document.addEventListener('keydown',e=>{if(e.target.id==='cDisp'&&e.key==='Enter'){e.preventDefault();document.querySelector('[data-ck="="]').click()}});
+function dozCalc(){const mode=$('#dzMode').value,m=num($('#dzMass').value),p=num($('#dzPct').value);$('#dzMassL').textContent=mode==='base'?'Masa asfaltu bazowego [g]':'Masa całej mieszanki [g]';
+  if(!(m>0)||!(p>=0&&p<100)){$('#dzOut').innerHTML='<dt>Wynik</dt><dd>—</dd>';return}
+  let add,base,tot;if(mode==='base'){base=m;add=m*p/(100-p);tot=base+add}else{tot=m;add=m*p/100;base=tot-add}
+  $('#dzOut').innerHTML=`<dt>Dodatek</dt><dd><b>${fmtN(add,2)} g</b></dd><dt>Asfalt bazowy</dt><dd>${fmtN(base,2)} g</dd><dt>Razem</dt><dd>${fmtN(tot,2)} g</dd>`;
+  $('#dzF').textContent=mode==='base'?'dodatek = m_asfaltu × p / (100 − p)':'dodatek = m_mieszanki × p / 100'}
+function unitCalc(){const v=num($('#uVal').value),u=$('#uFrom').value,o=$('#uOut');if(!isFinite(v)){o.innerHTML='';return}
+  const dyn={mPas:1,Pas:1000,cP:1,P:100},kin={mm2s:1,cSt:1,m2s:1e6};let rows=[];
+  if(u in dyn){const b=v*dyn[u];rows=[['mPa·s',b],['Pa·s',b/1000],['cP',b],['P',b/100]]}
+  else if(u in kin){const b=v*kin[u];rows=[['mm²/s',b],['cSt',b],['m²/s',b/1e6]]}
+  else{const c=u==='C'?v:u==='F'?(v-32)*5/9:v-273.15;rows=[['°C',c],['°F',c*9/5+32],['K',c+273.15]]}
+  o.innerHTML=rows.map(([n,x])=>`<dt>${n}</dt><dd>${fmtC(x)}</dd>`).join('')}
+
+/* ===== start programu ===== */
+fillHelp();
+if(DESK){fetch('/api/info').then(r=>r.json()).then(i=>{const el=$('#deskInfo');el.hidden=false;
+  el.innerHTML=`<span>Dane zapisują się automatycznie w folderze <b>Dane</b> obok programu, z kopiami zapasowymi.</span><button class="sec" id="openData">Otwórz folder z danymi</button>`;
+}).catch(()=>{});
+  document.addEventListener('click',e=>{if(e.target.id==='openData')fetch('/api/open',{method:'POST'}).catch(()=>{})})}
+document.body.insertAdjacentHTML('beforeend',`<datalist id="reasons"><option value="próbka zerwana przed końcem badania"><option value="za duży rozrzut wyników"><option value="błąd lub awaria aparatu"><option value="za mało materiału"><option value="próbka zanieczyszczona"><option value="nieprawidłowa temperatura łaźni"></datalist>`);
+function sampleCurve(peak,tail){let s='';for(let x=0;x<=400;x+=25){const f=x<=25?peak*x/25:peak*Math.exp(-(x-25)/70)+tail*(1-Math.exp(-(x-25)/120));s+=`${x};${f.toFixed(1).replace('.',',')}\n`}return s.trim()}
+if(!samples){
+  const base=newSample({nr:'P-100/26',grade:'70/100',isBase:true,example:true,desc:'asfalt drogowy 70/100',who:'przykład'});applyGrade(base);
+  Object.assign(base.tests.pen,{reads:['84','86','85']});Object.assign(base.tests.pik,{a:'46.2',b:'46.6'});Object.assign(base.tests.ner,{reads:['22','26']});
+  base.tests.en.specs=[sampleCurve(30,0.8),sampleCurve(29,0.7),sampleCurve(31,0.9)].map(txt=>({T:'10',txt}));base.tests.lep.sets=[{T:'90',reads:['1840','1870'],cap:[['',''],['','']]},{T:'110',reads:['780','792'],cap:[['',''],['','']]},{T:'135',reads:['410','415','412'],cap:[['',''],['','']]}];
+  const mod=newSample({nr:'P-128/26',grade:'PMB 45/80-65',baseId:base.id,example:true,desc:'asfalt drogowy 70/100, SBS',who:'przykład'});applyGrade(mod);mod.req.ner='80';mod.req.en='1';
+  Object.assign(mod.tests.pen,{reads:['65','67','66']});Object.assign(mod.tests.pik,{a:'70.2',b:'70.6'});Object.assign(mod.tests.ner,{reads:['162','166']});
+  mod.tests.en.specs=[sampleCurve(42,6.2),sampleCurve(40,6.0),sampleCurve(43,6.4)].map(txt=>({T:'10',txt}));mod.tests.lep.sets=[{T:'90',reads:['3920','3965'],cap:[['',''],['','']]},{T:'110',reads:['1510','1528'],cap:[['',''],['','']]},{T:'135',reads:['612','618','615'],cap:[['',''],['','']]}];
+  samples=[base,mod];save()}
+show('start');
+</script>
+
+<script>if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</html>
