@@ -1,5 +1,5 @@
 // PaviaLAB – praca offline: wszystkie pliki aplikacji są zapisywane w pamięci telefonu.
-const CACHE = 'pavialab-v0.08';
+const CACHE = 'pavialab-v0.09';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-32.png', './icon-192.png', './icon-512.png', './maskable-192.png', './maskable-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => Promise.all(k.filter(n => n !== CACHE).map(n => caches.delete(n)))).then(() => self.clients.claim())); });

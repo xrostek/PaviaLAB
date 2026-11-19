@@ -302,6 +302,53 @@ dialog::backdrop{background:rgba(12,15,14,.6)}
 .chartcard{position:relative}
 .chartcopy{position:absolute;top:12px;right:12px;font-size:12px!important;padding:4px 9px!important}
 .chartcard>h3{padding-right:110px}
+/* karta BTDC */
+.btgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:20px 28px;align-items:start}
+.btsrc th{text-transform:none;letter-spacing:0;font-size:13px;white-space:normal;color:var(--muted);font-weight:600}
+.btrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 34px;gap:8px;align-items:end;margin-bottom:8px}
+.btrow .cx{margin-bottom:6px}
+.btsheet{display:grid;gap:14px}
+.btsheet h3{margin:4px 0 0}
+.bthead{display:flex;gap:14px;align-items:center;border-bottom:3px solid var(--ink);padding-bottom:10px}
+.bttitle{font-family:var(--f-display);font-weight:700;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing:.03em}
+.btstamp{font-family:var(--f-display);font-weight:700;font-size:20px;text-align:right;line-height:1.1}
+.btstamp .lab{color:var(--accent-ink)}.btstamp span:last-child{font:12px var(--f-mono);color:var(--muted)}
+.clsbox{display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center;border:1px solid var(--line);border-left:6px solid var(--muted);border-radius:8px;padding:12px 14px;background:var(--bg)}
+.clsbox p{margin:4px 0 6px;font-size:14px}
+.clsk{font:700 46px/1 var(--f-display);text-align:center;color:var(--muted)}
+.clsbox.cS{border-left-color:var(--ok)}.clsbox.cS .clsk{color:var(--ok)}
+.clsbox.cB,.clsbox.cW{border-left-color:var(--accent)}.clsbox.cB .clsk,.clsbox.cW .clsk{color:var(--accent-ink)}
+.clsbox.cP{border-left-color:var(--base)}.clsbox.cP .clsk{color:var(--base);font-size:30px}
+.clsbox.cM{border-left-color:var(--base)}.clsbox.cM .clsk{color:var(--base)}
+.btchart .chart{margin-top:6px}
+.btchart .legend i{width:12px;height:12px}
+.chart .btpen{fill:var(--accent);opacity:.05}
+.chart .btref{stroke:var(--ink);stroke-width:1.4;opacity:.75}
+.chart .btreft{fill:var(--ink);font-weight:600}
+.chart .btsm{fill:var(--muted);font:11px var(--f-body)}
+.chart .btlev{stroke:var(--accent-ink);stroke-width:1;stroke-dasharray:3 4;opacity:.8}
+.chart .btlevt{fill:var(--accent-ink)}
+.chart .btS{fill:none;stroke:var(--muted);stroke-width:1.4;stroke-dasharray:7 5}
+.chart .btPenL{fill:none;stroke:var(--accent);stroke-width:2.6}
+.chart .btVisL{fill:none;stroke:var(--ok);stroke-width:2.6}
+.chart .bteq{stroke:var(--accent-ink);stroke-width:1;stroke-dasharray:2 3;opacity:.7}
+.chart .bteqt{fill:var(--accent-ink);font-weight:500}
+.chart .btSP{fill:var(--base);stroke:var(--panel);stroke-width:1.5}
+.chart .btFr{fill:var(--bad);stroke:var(--panel);stroke-width:1.5}
+.chart .btVis{fill:var(--ok);stroke:var(--panel);stroke-width:1.5}
+.btbase summary{cursor:pointer;font-weight:600}
+.btbase .meth{margin-top:8px;font-size:14px}
+.rest td.num.bad b{color:var(--bad)}
+@media print{
+  body.pr-btdc{background:#fff}
+  body.pr-btdc header,body.pr-btdc .ver,body.pr-btdc .view:not(#v-btdc),body.pr-btdc #v-btdc>.card:not(#btdcSheet),body.pr-btdc .chartcopy{display:none!important}
+  body.pr-btdc main{padding:0}
+  body.pr-btdc #btdcSheet{border:0;padding:0;gap:10px;font-size:12px}
+  body.pr-btdc #btdcSheet,body.pr-btdc #btdcSheet *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.pr-btdc .chartcard,body.pr-btdc .clsbox,body.pr-btdc tr{break-inside:avoid}
+  body.pr-btdc .concl li{padding:5px 8px;font-size:12px}
+}
+@page{size:A4;margin:12mm}
 pre.out{font:13px/1.5 var(--f-mono);white-space:pre-wrap;background:var(--bg);border-radius:6px;padding:12px;margin:10px 0 0;max-height:320px;overflow:auto}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -342,6 +389,7 @@ pre.out{font:13px/1.5 var(--f-mono);white-space:pre-wrap;background:var(--bg);bo
       <button data-v="calc">Kalkulator</button>
       <button data-v="cnote">Notka obliczeniowa</button>
       <button data-v="lit">Literatura</button>
+      <button data-v="btdc">Karta BTDC</button>
     </nav>
   </div>
 </header>
@@ -516,6 +564,29 @@ pre.out{font:13px/1.5 var(--f-mono);white-space:pre-wrap;background:var(--bg);bo
       <li><b>Porównanie z próbką bazową</b>: Δ = x − x<sub>b</sub>, δ = Δ / x<sub>b</sub> · 100 %; lepkość porównywana tylko w tej samej temperaturze i jednostce.</li>
     </ul>
 
+    <h3>6. Karta jakości asfaltu BTDC</h3>
+    <ol class="refs" start="18">
+      <li id="r18">Heukelom W., <i>A bitumen test data chart for showing the effect of temperature on the mechanical behaviour of asphaltic bitumens</i>, Journal of the Institute of Petroleum, 55 (546), 1969, s. 404–417. Pierwotna wersja karty BTDC.</li>
+      <li id="r19">Heukelom W., <i>An improved method of characterizing asphaltic bitumens with the aid of their mechanical properties</i>, Proceedings AAPT, 42, 1973, s. 67–98. Ostateczna wersja karty, lepkość 1300 Pa·s w temperaturze PiK.</li>
+      <li id="r20">Parhamifar E., Tyllgren P., <i>Assessment of asphalt binder viscosities with a new approach</i>, 6th Eurasphalt &amp; Eurobitume Congress, Praga 2016. Skala lepkości karty wg WLF, C₁ = 8,5. <a href="https://vagcentrum.se/EE%202016%20ID35.pdf" target="_blank" rel="noopener">vagcentrum.se</a></li>
+      <li id="r21">Hunter R.N., Self A., Read J., <i>The Shell Bitumen Handbook</i>, wyd. 6, ICE Publishing, 2015, rozdz. 6.4 (we wcześniejszych wydaniach rozdz. 7.4–7.5). Budowa skal karty, klasy S, B i W, indeks penetracji.</li>
+      <li id="r22">Piłat J., Radziszewski P., Król J., <i>Technologia materiałów i nawierzchni asfaltowych</i>, WKŁ, rozdz. 5.2.15 „Karta Jakości Asfaltu – wykres BTDC”. Gaweł I., Kalabińska M., Piłat J., <i>Asfalty drogowe</i>, WKŁ, 2001. Kalabińska M., Piłat J., <i>Reologia asfaltów i mas mineralno-asfaltowych</i>, WKŁ, 1982.</li>
+      <li id="r23">Airey G.D., <i>Viscosity–temperature effects of polymer modification as depicted by Heukelom's bitumen test data chart</i>. Karta BTDC dla asfaltów modyfikowanych polimerem. <a href="https://www.researchgate.net/publication/233023020" target="_blank" rel="noopener">researchgate.net</a></li>
+      <li id="r24">Edwards Y., <i>Influence of waxes on bitumen and asphalt concrete mixture performance</i>, rozprawa doktorska, KTH Sztokholm. Parafina na karcie BTDC: strefa przejściowa, PiK z lepkości niższa niż zmierzona. <a href="https://www.diva-portal.org/smash/get/diva2:14419/fulltext01.pdf" target="_blank" rel="noopener">diva-portal.org</a></li>
+      <li id="r25">Słowik M., Adamczak P., artykuł o ocenie wpływu starzenia lepiszczy asfaltowych, Drogi i Mosty, nr 1/2007 (lepkość 0,2 Pa·s jako temperatura otaczania, odczyt z karty BTDC). <a href="https://rabdim.pl/index.php/rb/article/download/v6n1p41/172" target="_blank" rel="noopener">rabdim.pl</a></li>
+      <li id="r26">ORLEN Asfalt, Błażejowski K., Wójcik-Wiśniewska M., <i>Poradnik Asfaltowy 2016</i>. Średnie właściwości asfaltów 20/30–160/220 z 2015 r. (podstawa kalibracji skali), lepkość 2 Pa·s jako minimalna temperatura pompowania. <a href="https://asfalt.orlen.pl/content/dam/internet/orlen-asfalt/pl/pl/informacje-techniczne/nasze-publikacje/Poradnik%20Asfaltowy%202016.pdf.coredownload.pdf" target="_blank" rel="noopener">asfalt.orlen.pl</a></li>
+      <li id="r27"><i>Comparative methodology of viscosity-based classification and measurement techniques for high-temperature behaviour of paving grade bitumen</i>, Applied Sciences, 16 (5), 2208, 2026. Wzór Heukeloma na lepkość w 60 °C z PiK (C₁ = 8,5, C₂ = 110) i jego dokładność. <a href="https://doi.org/10.3390/app16052208" target="_blank" rel="noopener">doi.org/10.3390/app16052208</a></li>
+      <li id="r28"><b>PN-EN 12593</b> Asfalty i lepiszcza asfaltowe – Oznaczanie temperatury łamliwości metodą Fraassa. Artykuł o temperaturze końca zagęszczania (20 Pa·s): Drogownictwo 7/2015, s. 225–230. <a href="https://yadda.icm.edu.pl/baztech/element/bwmeta1.element.baztech-5d885d65-b7f3-4ff8-96f9-45c216efae1b/c/225_230_7_2015.pdf" target="_blank" rel="noopener">yadda.icm.edu.pl</a></li>
+    </ol>
+    <h3>7. Jak program buduje kartę BTDC</h3>
+    <ul class="meth">
+      <li><b>Osie</b> [18, 19, 21]: temperatura w skali liniowej, penetracja w skali logarytmicznej, lepkość w skali dobranej tak, by asfalty o „normalnej” wrażliwości temperaturowej dawały prostą. Obie skale pionowe łączą się w punkcie PiK: penetracja 800 ×0,1 mm odpowiada lepkości 1300 Pa·s. Temperatura łamliwości Fraassa odpowiada penetracji 1,25 ×0,1 mm.</li>
+      <li><b>Skala lepkości</b> [20]: współrzędna u = −L / (8,5 + L), gdzie L = log(η / 1300 Pa·s). Wtedy linia lepkości wg WLF ze stałą C₁ = 8,5 jest prostą T = T<sub>1300</sub> + C₂·u, a jej nachylenie zależy od C₂.</li>
+      <li><b>Połączenie skal</b>: współrzędna pionowa karty to log(P / 800) w części penetracji i K·u w części lepkości. Prosta klasy S ma więc C₂ = K / A. Literatura dostępna programowi nie podaje liczbowo położenia skal z oryginalnego wykresu, dlatego K = 6,0 dobrano tak, by średnie wyniki asfaltów ORLEN 20/30–160/220 [26] leżały na prostej (lepkość kinematyczną w 135 °C przeliczono z gęstością 0,96 g/cm³). Dla tych asfaltów wychodzi K od 5,6 do 6,3. Równoważne temperatury łamliwości T1,25 tych asfaltów różnią się od zmierzonych temperatur Fraassa o 1–5 °C, co potwierdza część penetracyjną karty.</li>
+      <li><b>Klasy</b> [19, 21, 23, 24]: S, gdy linia lepkości przedłuża prostą penetracji; B (asfalt utleniony), gdy wykres załamuje się w okolicy PiK, a linia lepkości jest bardziej stroma; W (asfalt parafinowy), gdy linia lepkości jest przesunięta w stronę niższych temperatur. Asfalty modyfikowane polimerem zwykle nie dają prostej [23].</li>
+      <li><b>Temperatury technologiczne</b> [22, 25, 26, 28]: otaczanie przy 0,2 Pa·s, pompowanie przy 2 Pa·s, koniec skutecznego zagęszczania przy 20 Pa·s, odczytane z linii lepkości. Bez pomiaru lepkości program podaje prognozę z prostej klasy S.</li>
+      <li><b>Gęstość</b>: przy lepkości kinematycznej η = ν·ρ, a gęstość w temperaturze badania liczona jest z gęstości w 25 °C i rozszerzalności objętościowej 6·10⁻⁴ 1/°C. To przybliżenie programu.</li>
+    </ul>
     <h3>5. Stan weryfikacji</h3>
     <div class="tbl"><table>
       <thead><tr><th>Element programu</th><th>Podstawa</th><th>Status</th></tr></thead>
@@ -531,6 +602,12 @@ pre.out{font:13px/1.5 var(--f-mono);white-space:pre-wrap;background:var(--bg);bo
         <tr><td>Wymagania 20/30, 35/50, 100/150 i PMB</td><td>[10, 11]</td><td><span class="vs no">do potwierdzenia</span></td></tr>
         <tr><td>Wzór indeksu PI</td><td>[10, 12]</td><td><span class="vs no">do potwierdzenia</span></td></tr>
         <tr><td>Lepkość: kryteria powtarzalności</td><td>[6–8]</td><td><span class="vs no">do potwierdzenia</span></td></tr>
+        <tr><td>Karta BTDC: osie, PiK przy pen 800 i 1300 Pa·s, Fraass przy pen 1,25, klasy S, B, W</td><td>[18–21, 24]</td><td><span class="vs ok">potwierdzone</span></td></tr>
+        <tr><td>Skala lepkości karty: WLF z C₁ = 8,5</td><td>[20]</td><td><span class="vs ok">potwierdzone</span></td></tr>
+        <tr><td>Położenie skali lepkości względem penetracji (K = 6,0)</td><td>[26]</td><td><span class="vs no">rekonstrukcja, do potwierdzenia z oryginałem</span></td></tr>
+        <tr><td>Temperatury technologiczne 0,2 / 2 / 20 Pa·s</td><td>[22, 25, 26, 28]</td><td><span class="vs ok">potwierdzone</span></td></tr>
+        <tr><td>Progi klas na karcie (4 °C, nachylenie 80–125 %)</td><td>—</td><td><span class="vs pr">praktyka / interpretacja</span></td></tr>
+        <tr><td>Rozszerzalność gęstości 6·10⁻⁴ 1/°C</td><td>—</td><td><span class="vs no">przybliżenie, do potwierdzenia</span></td></tr>
         <tr><td>Wnioski w podsumowaniu, progi „bez zmian”</td><td>—</td><td><span class="vs pr">praktyka / interpretacja</span></td></tr>
       </tbody></table></div>
   </div>
@@ -551,8 +628,19 @@ pre.out{font:13px/1.5 var(--f-mono);white-space:pre-wrap;background:var(--bg);bo
   <div class="cmpgrid" id="cmpCharts"></div>
 </section>
 
+<!-- KARTA JAKOŚCI BTDC -->
+<section class="view" id="v-btdc" hidden>
+  <div class="card">
+    <div class="cmpbar"><div><h2>Karta jakości asfaltu BTDC</h2><div class="norm">Wykres Heukeloma · penetracja, PiK, Fraass i lepkość w funkcji temperatury</div></div>
+      <div class="btns"><select id="btSample" aria-label="Próbka na karcie" style="width:auto;font-family:var(--f-body)"></select><button class="pri" id="btPrint" style="padding:9px 16px;font-size:14px">Drukuj lub zapisz PDF</button><button class="sec" id="btCopy">Kopiuj kartę do Worda</button></div></div>
+    <p class="note" style="margin-top:6px">Karta pokazuje, jak konsystencja asfaltu zmienia się z temperaturą: od temperatury łamliwości, przez penetrację i PiK, po lepkość w temperaturach technologicznych. Na tej podstawie odczytasz klasę asfaltu, indeks penetracji i temperatury otaczania, pompowania oraz zagęszczania.</p>
+  </div>
+  <div class="card" id="btIn"></div>
+  <div class="card btsheet" id="btdcSheet"></div>
+</section>
+
 </div></main>
-<div class="ver" aria-label="Wersja programu">PaviaLAB v0.08</div>
+<div class="ver" aria-label="Wersja programu">PaviaLAB v0.09</div>
 
 <script>
 /* ===== pomocnicze ===== */
@@ -771,7 +859,7 @@ function barsChart(rows,dec){const W=360,rh=40,LW=138,vmax=Math.max(...rows.filt
 function show(v){if(v==='tests'&&!cur)v='start';view=v;if(v==='tests')store.set('asf_last',cur.id);
   document.querySelectorAll('.view').forEach(s=>s.hidden=s.id!=='v-'+v);
   document.querySelectorAll('#nav button').forEach(b=>{b.setAttribute('aria-current',b.dataset.v===v);b.disabled=b.dataset.v==='tests'&&!cur});
-  if(v==='start')renderStart();if(v==='tests'){renderAllInputs();renderResults()}if(v==='compare')renderCompare();if(v==='notes')renderNotes();if(v==='calc')renderCalc();if(v==='cnote')renderCalcNote();
+  if(v==='start')renderStart();if(v==='tests'){renderAllInputs();renderResults()}if(v==='compare')renderCompare();if(v==='notes')renderNotes();if(v==='calc')renderCalc();if(v==='cnote')renderCalcNote();if(v==='btdc')renderBtdc();
   scrollTo(0,0)}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]')||e.target.closest('#nav button');if(g)show(g.dataset.go||g.dataset.v)});
 
@@ -1337,6 +1425,225 @@ if(DESK){fetch('/api/info').then(r=>r.json()).then(i=>{const el=$('#deskInfo');e
 }).catch(()=>{});
   document.addEventListener('click',e=>{if(e.target.id==='openData')fetch('/api/open',{method:'POST'}).catch(()=>{})})}
 document.body.insertAdjacentHTML('beforeend',`<datalist id="reasons"><option value="próbka zerwana przed końcem badania"><option value="za duży rozrzut wyników"><option value="błąd lub awaria aparatu"><option value="za mało materiału"><option value="próbka zanieczyszczona"><option value="nieprawidłowa temperatura łaźni"></datalist>`);
+/* ===== Karta jakości asfaltu BTDC (Bitumen Test Data Chart, Heukelom 1969/1973) =====
+   Oś pozioma: temperatura (liniowa). Oś pionowa ma dwie skale połączone w punkcie PiK (T800):
+   - penetracja: z = log(P/800), skala logarytmiczna (pen 800 = PiK, pen 1,25 = Fraass),
+   - lepkość: z = K·u, u = −L/(C1+L), L = log(η/1300 Pa·s), C1 = 8,5 (równanie WLF w wersji Heukeloma).
+   Dla asfaltu klasy S linia penetracji i linia lepkości tworzą jedną prostą z = A·(T − T800),
+   czyli stała C2 linii lepkości wynosi K/A. Stałą K = 6,0 dobrano tak, aby średnie właściwości asfaltów
+   20/30…160/220 (ORLEN, 2015: pen 25 °C, PiK, lepkość kinematyczna 135 °C) leżały na prostej; to rekonstrukcja skali,
+   a nie odczyt z oryginalnego wykresu. */
+const BT={C1:8.5,ETA:1300,K:6.0,PSP:800,PFR:1.25,BETA:6e-4,
+  LEV:[[0.2,'Otaczanie kruszywa','0,2 Pa·s'],[2,'Minimalna temperatura pompowania','2 Pa·s'],[20,'Koniec skutecznego zagęszczania','20 Pa·s']]};
+const L10=Math.log10;
+const btU=eta=>{const L=L10(eta/BT.ETA);return -L/(BT.C1+L)};
+const btEta=u=>BT.ETA*Math.pow(10,-BT.C1*u/(1+u));
+const zP=P=>L10(P/BT.PSP);
+const zV=eta=>BT.K*btU(eta);
+const fEta=e=>!isFinite(e)?'—':e>=100?fmt(e,0):e>=10?fmt(e,1):e>=1?fmt(e,2):fmt(e,3);
+const fT=t=>isFinite(t)?fmt(t,1).replace('-','−')+' °C':'—';
+function linfit(pts){const mx=mean(pts.map(p=>p[0])),my=mean(pts.map(p=>p[1]));let sxx=0,sxy=0,syy=0;
+  pts.forEach(([x,y])=>{sxx+=(x-mx)**2;sxy+=(x-mx)*(y-my);syy+=(y-my)**2});const b=sxy/sxx;return{a:my-b*mx,b,r2:syy&&sxx?sxy*sxy/(sxx*syy):1}}
+function btNorm(s){if(!s.btdc)s.btdc={pens:[{T:'',P:''}],fr:'',rho:'1.03',vis:[{T:'',v:''}]};const b=s.btdc;
+  if(!b.pens||!b.pens.length)b.pens=[{T:'',P:''}];if(!b.vis||!b.vis.length)b.vis=[{T:'',v:''}];if(b.rho===undefined)b.rho='1.03';return b}
+const isMod=s=>/PMB|SBS|EVA|polimer|gum|PE\b/i.test([s.grade,s.desc,...(s.comps||[]).map(c=>c.n)].join(' '));
+
+function btdcCalc(s){const b=btNorm(s),r=compute(s),o={warn:[],pens:[],vis:[]};
+  if(r.pen.val!==undefined)o.pens.push({T:25,P:r.pen.val,src:'Badania · PN-EN 1426'});
+  b.pens.forEach(p=>{const T=num(p.T),P=num(p.P);if(isFinite(T)&&isFinite(P)&&P>0)o.pens.push({T,P,src:'wpis na karcie'})});
+  o.SP=r.pik.val!==undefined?r.pik.val:NaN;o.Fr=num(b.fr);o.PI=r.pi.val;
+  const lt=s.tests.lep,rho=num(b.rho);
+  if(!r.lep.status&&r.lep.sets)r.lep.sets.forEach(st=>{const T=num(st.T);if(!isFinite(T))return;let e,src;
+    if(lt.m==='rot'){e=st.val/1000;src='PN-EN 13302 · '+fmt(st.val,st.d)+' mPa·s'}
+    else if(lt.m==='cap'){e=st.val;src='PN-EN 12596'}
+    else{if(!isFinite(rho)){o.warn.push('Lepkość kinematyczna wymaga gęstości, aby przeliczyć ją na Pa·s.');return}
+      const rT=rho/(1+BT.BETA*(T-25));e=st.val*rT/1000;src=`PN-EN 12595 · ${fmt(st.val,st.d)} mm²/s × ${fmt(rT,3)} g/cm³`}
+    if(e>0)o.vis.push({T,eta:e,src})});
+  b.vis.forEach(v=>{const T=num(v.T),e=num(v.v);if(isFinite(T)&&e>0)o.vis.push({T,eta:e,src:'wpis na karcie'})});
+  o.pens.sort((a,c)=>a.T-c.T);o.vis.sort((a,c)=>a.T-c.T);
+  // linia penetracji
+  const nT=new Set(o.pens.map(p=>p.T)).size;
+  if(nT>=2){const f=linfit(o.pens.map(p=>[p.T,L10(p.P)]));o.A=f.b;o.T800=(L10(BT.PSP)-f.a)/f.b;o.r2=f.r2;o.penSrc='reg'}
+  else if(o.pens.length&&isFinite(o.SP)&&o.SP>o.pens[0].T){const p=o.pens[0];o.A=(L10(BT.PSP)-L10(p.P))/(o.SP-p.T);o.T800=o.SP;o.penSrc='sp'}
+  if(o.A!==undefined&&!(o.A>0)){o.warn.push('Penetracja nie rośnie z temperaturą. Sprawdź wpisane penetracje.');o.A=undefined;o.T800=undefined}
+  if(o.A>0){o.PIA=(20-500*o.A)/(1+50*o.A);o.T125=o.T800+(L10(BT.PFR)-L10(BT.PSP))/o.A;o.TZPe=o.T800-o.T125;o.C2S=BT.K/o.A}
+  if(isFinite(o.SP)&&isFinite(o.Fr))o.TZP=o.SP-o.Fr;
+  // linia lepkości (WLF, C1 = 8,5)
+  const vT=new Set(o.vis.map(v=>v.T)).size;
+  if(vT>=2){const f=linfit(o.vis.map(v=>[v.T,btU(v.eta)]));if(f.b>0){o.C2=1/f.b;o.T1300=-f.a/f.b;o.visSrc='fit';o.vr2=f.r2}
+    else o.warn.push('Lepkość nie maleje z temperaturą. Sprawdź wyniki lepkości.')}
+  else if(o.vis.length===1&&isFinite(o.SP)&&o.vis[0].T-o.SP>5){const u=btU(o.vis[0].eta);if(u>0){o.C2=(o.vis[0].T-o.SP)/u;o.T1300=o.SP;o.visSrc='sp'}}
+  // temperatury technologiczne
+  const lineT=eta=>o.C2>0?o.T1300+o.C2*btU(eta):o.C2S?o.T800+o.C2S*btU(eta):NaN;
+  o.eqSrc=o.C2>0?(o.visSrc==='fit'?'pomiar':'pomiar + PiK'):o.C2S?'prognoza S':'';
+  o.eq=BT.LEV.map(([eta,name,lab])=>({eta,name,lab,T:lineT(eta)}));
+  if(isFinite(o.SP)){const L=-BT.C1*(60-o.SP)/(110+60-o.SP);o.eta60H=BT.ETA*Math.pow(10,L)}
+  // porównanie z prostą klasy S i klasa
+  if(o.C2S)o.vis.forEach(v=>{v.etaS=btEta((v.T-o.T800)/o.C2S);v.dev=(v.eta/v.etaS-1)*100});
+  o.mod=isMod(s);
+  if(o.visSrc==='fit'&&o.C2S){o.dT=o.T1300-o.T800;o.q=o.C2/o.C2S;
+    o.cls=o.mod?'P':Math.abs(o.dT)<=4&&o.q>=0.8&&o.q<=1.25?'S':o.dT<-4?'W':o.q<0.8?'B':'M'}
+  return o}
+
+const BT_CLS={
+  S:['Klasa S','Asfalt o „normalnej” wrażliwości temperaturowej (podestylacyjny). Penetracje, PiK i lepkości układają się na jednej prostej, więc z penetracji i PiK można przewidzieć lepkość w szerokim zakresie temperatur.'],
+  B:['Charakter klasy B','Tak zachowują się asfalty utlenione (dmuchane). Linia lepkości jest bardziej stroma niż przedłużenie linii penetracji, więc wykres załamuje się w okolicy PiK. Lepkość w wysokiej temperaturze jest niższa, niż wynikałoby z penetracji i PiK.'],
+  W:['Charakter klasy W','Tak zachowują się asfalty parafinowe. Linia lepkości jest przesunięta w stronę niższych temperatur, a temperatura, w której lepkość wynosi 1300 Pa·s, leży poniżej T800. Między zakresem penetracji a zakresem lepkości jest strefa przejściowa, w której topi się lub krystalizuje parafina.'],
+  P:['Asfalt modyfikowany, bez klasy S, B, W','Karta BTDC powstała dla asfaltów niemodyfikowanych, więc klas S, B i W nie przypisuje się. Wykres pokazuje, o ile linia lepkości odbiega od prostej wyznaczonej z penetracji i PiK, i służy do porównania z asfaltem bazowym.'],
+  M:['Poza klasami S, B i W','Lepkość w wysokiej temperaturze jest wyższa, niż wynikałoby z penetracji i PiK (linia lepkości jest bardziej płaska lub przesunięta w stronę wyższych temperatur). Tak zwykle zachowują się asfalty modyfikowane, np. polimerem SBS.']};
+
+let btId=null;
+const btSample=()=>{if(!samples.length)return null;if(!btId||!byId(btId))btId=(cur||samples[samples.length-1]).id;return byId(btId)};
+function renderBtdc(){const sel=$('#btSample');
+  if(!samples.length){sel.innerHTML='';$('#btIn').innerHTML='<p class="note">Brak próbek. Dodaj próbkę na ekranie Start.</p>';$('#btdcSheet').innerHTML='';return}
+  const s=btSample();sel.innerHTML=samples.map(x=>`<option value="${x.id}"${x.id===s.id?' selected':''}>${esc(label(x))}${x.grade?' · '+esc(gradeName(x)):''}</option>`).join('');
+  renderBtdcInputs(s);renderBtdcSheet(s)}
+
+function renderBtdcInputs(s){const b=btNorm(s),r=compute(s),lt=s.tests.lep;
+  const stat=(k,t)=>r[k].status?`<span class="lost">${r[k].status==='fail'?'badanie nie wyszło':'nie wykonywano'}</span>`:t;
+  const lepTxt=r.lep.status?stat('lep'):r.lep.sets&&r.lep.sets.length?r.lep.sets.map(a=>`${esc(a.T)} °C: ${a.short}`).join('<br>'):'<span class="note" style="margin:0">brak</span>';
+  $('#btIn').innerHTML=`<h2>Dane do karty</h2><div class="norm" style="margin-bottom:12px">Wyniki z zakładki Badania wchodzą na kartę same. Tu dopisz to, czego nie ma w badaniach.</div>
+  <div class="btgrid">
+    <div><h3>Z zakładki Badania</h3><div class="tbl"><table class="btsrc"><tbody>
+      <tr><th>Penetracja w 25 °C</th><td class="num">${stat('pen',r.pen.val!==undefined?r.pen.val+' ×0,1 mm':'<span class="note" style="margin:0">brak</span>')}</td></tr>
+      <tr><th>Temperatura mięknienia PiK</th><td class="num">${stat('pik',r.pik.val!==undefined?fmt(r.pik.val,1)+' °C':'<span class="note" style="margin:0">brak</span>')}</td></tr>
+      <tr><th>Lepkość <span class="norm" style="text-transform:none">${esc(LEP[lt.m].n.split('·')[0])}</span></th><td class="num">${lepTxt}</td></tr>
+    </tbody></table></div>
+    <button class="sec" data-btgo="${s.id}" style="margin-top:8px">Popraw wyniki w zakładce Badania</button>
+    ${lt.m==='kin'?`<div class="field" style="margin-top:14px;max-width:260px"><label for="btRho">Gęstość w 25 °C [g/cm³]</label><input id="btRho" data-bt="rho" type="number" step="any" inputmode="decimal" value="${esc(b.rho)}"><span class="note" style="margin:2px 0 0">Do przeliczenia mm²/s na Pa·s. Gęstość w temperaturze badania liczona z rozszerzalności 6·10⁻⁴ 1/°C.</span></div>`:''}</div>
+    <div><h3>Temperatura łamliwości Fraassa</h3>
+      <div class="field" style="max-width:220px"><label for="btFr">T<sub>Fraass</sub> [°C] · PN-EN 12593</label><input id="btFr" data-bt="fr" type="number" step="any" inputmode="decimal" value="${esc(b.fr)}" placeholder="np. −12"></div>
+      <h3 style="margin-top:16px">Penetracja w innych temperaturach</h3>
+      <p class="note" style="margin:-4px 0 8px">Np. 5, 10 lub 15 °C, przy tym samym obciążeniu 100 g i czasie 5 s. Dwie lub więcej temperatur dają prostą penetracji bez założenia o PiK.</p>
+      ${b.pens.map((p,i)=>`<div class="btrow"><div class="field"><label>Temp. [°C]</label><input data-bp="${i}:T" type="number" step="any" inputmode="decimal" value="${esc(p.T)}"></div><div class="field"><label>Penetracja [×0,1 mm]</label><input data-bp="${i}:P" type="number" step="any" inputmode="decimal" value="${esc(p.P)}"></div><button class="cx" data-btdel="pens:${i}" aria-label="Usuń wiersz">×</button></div>`).join('')}
+      <button class="sec" data-btadd="pens">+ Dodaj temperaturę</button></div>
+    <div><h3>Dodatkowe lepkości</h3>
+      <p class="note" style="margin:-4px 0 8px">Np. lepkość dynamiczna w 60 °C z kapilary próżniowej. Wpisuj w Pa·s (1 Pa·s = 1000 mPa·s).</p>
+      ${b.vis.map((v,i)=>`<div class="btrow"><div class="field"><label>Temp. [°C]</label><input data-bv="${i}:T" type="number" step="any" inputmode="decimal" value="${esc(v.T)}"></div><div class="field"><label>Lepkość [Pa·s]</label><input data-bv="${i}:v" type="number" step="any" inputmode="decimal" value="${esc(v.v)}"></div><button class="cx" data-btdel="vis:${i}" aria-label="Usuń wiersz">×</button></div>`).join('')}
+      <button class="sec" data-btadd="vis">+ Dodaj lepkość</button></div>
+  </div>`}
+
+function btdcChart(o){if(!(o.A>0)&&!o.vis.length&&!o.pens.length)return'';
+  const W=760,H=540,L=66,R=78,T=16,B=46;
+  const temps=[...o.pens.map(p=>p.T),...o.vis.map(v=>v.T),o.SP,o.Fr,o.T125,o.T800,...o.eq.map(e=>e.T)].filter(isFinite);
+  let t0=Math.min(-30,...temps)-5,t1=Math.max(180,...temps)+10;t0=Math.max(-60,Math.floor(t0/10)*10);t1=Math.min(260,Math.ceil(t1/10)*10);
+  const zs=[...o.pens.map(p=>zP(p.P)),...o.vis.map(v=>zV(v.eta))];
+  const z0=Math.min(zP(0.55),...zs.map(z=>z-0.15)),z1=Math.min(zV(0.01),Math.max(zV(0.1),...zs.map(z=>z+0.3)));
+  const x=t=>L+(t-t0)/(t1-t0)*(W-L-R),y=z=>T+(z-z0)/(z1-z0)*(H-T-B),inT=t=>t>=t0&&t<=t1,inZ=z=>z>=z0-1e-9&&z<=z1+1e-9;
+  const seg=(f,ta,tb,cls)=>{ta=Math.max(t0,ta);tb=Math.min(t1,tb);if(!(tb>ta))return'';const pts=[];for(let i=0;i<=60;i++){const t=ta+(tb-ta)*i/60,z=f(t);if(isFinite(z))pts.push(x(t).toFixed(1)+','+y(Math.max(z0-0.5,Math.min(z1+0.5,z))).toFixed(1))}return`<polyline class="${cls}" points="${pts.join(' ')}"/>`};
+  let g='',lab='';
+  for(let t=Math.ceil(t0/10)*10;t<=t1;t+=10){g+=`<line class="ax" x1="${x(t)}" x2="${x(t)}" y1="${T}" y2="${H-B}" opacity="${t%50===0?.9:.35}"/>`;if(t%20===0)lab+=`<text x="${x(t)}" y="${H-B+16}" text-anchor="middle">${t}</text>`;}
+  g+=`<rect class="btpen" x="${L}" y="${T}" width="${W-L-R}" height="${Math.max(0,y(0)-T)}"/>`;
+  [1,2,5,10,20,50,100,200,500].filter(P=>inZ(zP(P))&&P!==1).forEach(P=>{g+=`<line class="ax" x1="${L}" x2="${W-R}" y1="${y(zP(P))}" y2="${y(zP(P))}" opacity=".45"/>`;lab+=`<text x="${L-6}" y="${y(zP(P))+4}" text-anchor="end">${P}</text>`});
+  [100,10,1,0.1,0.01].filter(e=>inZ(zV(e))).forEach(e=>{g+=`<line class="ax" x1="${L}" x2="${W-R}" y1="${y(zV(e))}" y2="${y(zV(e))}" opacity=".45"/>`;lab+=`<text x="${W-R+6}" y="${y(zV(e))+4}">${String(e).replace('.',',')}</text>`});
+  BT.LEV.forEach(([e,,lb])=>{if(inZ(zV(e)))g+=`<line class="btlev" x1="${L}" x2="${W-R}" y1="${y(zV(e))}" y2="${y(zV(e))}"/>`;lab+=`<text class="btlevt" x="${W-R+6}" y="${y(zV(e))+4}">${lb.replace(' Pa·s','')}</text>`});
+  g+=`<line class="btref" x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}"/>`;lab+=`<text x="${L-6}" y="${y(0)+4}" text-anchor="end" class="btreft">800</text><text x="${W-R+6}" y="${y(0)+4}" class="btreft">1300</text>`;
+  if(inZ(zP(BT.PFR)))g+=`<line class="btref" x1="${L}" x2="${W-R}" y1="${y(zP(BT.PFR))}" y2="${y(zP(BT.PFR))}" style="stroke-dasharray:6 4"/>`;if(inZ(zP(BT.PFR)))lab+=`<text x="${L-6}" y="${y(zP(BT.PFR))+4}" text-anchor="end" class="btreft">1,25</text>`;
+  g+=
+     `<text x="${L+8}" y="${y(0)-8}" class="btsm">pen 800 ≡ 1300 Pa·s (PiK)</text>`+
+     (inZ(zP(BT.PFR))?`<text x="${L+8}" y="${y(zP(BT.PFR))-6}" class="btsm">pen 1,25 (temperatura łamliwości Fraassa)</text>`:'');
+  // proste
+  if(o.A>0){const fS=t=>o.A*(t-o.T800);g+=seg(fS,t0,t1,'btS');g+=seg(fS,o.T125,o.T800,'btPenL')}
+  if(o.C2>0){const fV=t=>BT.K*(t-o.T1300)/o.C2,tv=Math.min(o.T1300,...o.vis.map(v=>v.T));g+=seg(fV,tv-5,t1,'btVisL')}
+  // równolepkościowe
+  if(o.eqSrc)o.eq.forEach(e=>{if(inT(e.T)&&inZ(zV(e.eta)))g+=`<line class="bteq" x1="${x(e.T)}" x2="${x(e.T)}" y1="${y(zV(e.eta))}" y2="${H-B}"/><text x="${x(e.T)+4}" y="${y(zV(e.eta))-6}" class="bteqt">${fmt(e.T,0)} °C</text>`});
+  // punkty
+  o.pens.forEach(p=>{if(inT(p.T)&&inZ(zP(p.P)))g+=`<circle class="mark" cx="${x(p.T)}" cy="${y(zP(p.P))}" r="5.5"><title>Penetracja ${fmt(p.P,0)} w ${fmt(p.T,1)} °C</title></circle>`});
+  if(isFinite(o.SP)&&inT(o.SP)){const cx=x(o.SP),cy=y(0);g+=`<path class="btSP" d="M${cx} ${cy-7}L${cx+7} ${cy}L${cx} ${cy+7}L${cx-7} ${cy}Z"><title>PiK ${fmt(o.SP,1)} °C</title></path>`}
+  if(isFinite(o.Fr)&&inT(o.Fr)&&inZ(zP(BT.PFR))){const cx=x(o.Fr),cy=y(zP(BT.PFR));g+=`<path class="btFr" d="M${cx} ${cy-7}L${cx+7} ${cy+5}L${cx-7} ${cy+5}Z"><title>Fraass ${fmt(o.Fr,0)} °C</title></path>`}
+  o.vis.forEach(v=>{if(inT(v.T)&&inZ(zV(v.eta)))g+=`<rect class="btVis" x="${x(v.T)-5}" y="${y(zV(v.eta))-5}" width="10" height="10" rx="1.5"><title>${fEta(v.eta)} Pa·s w ${fmt(v.T,1)} °C</title></rect>`});
+  return`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Karta BTDC: penetracja i lepkość w funkcji temperatury">
+  <defs><clipPath id="btClip"><rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}"/></clipPath></defs>
+  <rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" style="fill:none;stroke:var(--line)"/>
+  <g clip-path="url(#btClip)">${g}</g>${lab}
+  <text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle">temperatura [°C]</text>
+  <text x="14" y="${(T+y(0))/2}" transform="rotate(-90 14 ${(T+y(0))/2})" text-anchor="middle">penetracja [×0,1 mm], skala log.</text>
+  <text x="${W-12}" y="${(y(0)+H-B)/2}" transform="rotate(90 ${W-12} ${(y(0)+H-B)/2})" text-anchor="middle">lepkość [Pa·s], skala WLF</text>
+  </svg>`}
+
+function btdcRows(o,s){const R=[],src={reg:`prosta z ${o.pens.length} penetracji`,sp:'penetracja 25 °C i PiK (pen 800)'};
+  const row=(n,v,b,cls='')=>R.push({n,v,b,cls});
+  o.pens.forEach(p=>row(`Penetracja w ${fmt(p.T,p.T%1?1:0)} °C`,fmt(p.P,0)+' ×0,1 mm',p.src));
+  row('Temperatura mięknienia PiK',fT(o.SP),'Badania · PN-EN 1427');
+  row('Temperatura łamliwości Fraassa',isFinite(o.Fr)?fmt(o.Fr,0).replace('-','−')+' °C':'—','PN-EN 12593 · wpis na karcie');
+  o.vis.forEach(v=>row(`Lepkość w ${fmt(v.T,v.T%1?1:0)} °C`,fEta(v.eta)+' Pa·s',v.src));
+  row('Wrażliwość temperaturowa A',o.A>0?fmt(o.A,4)+' 1/°C':'—',o.penSrc?src[o.penSrc]+(o.penSrc==='reg'?`, R² = ${fmt(o.r2,3)}`:''):'');
+  row('Indeks penetracji PI (pen 25 °C + PiK)',o.PI!==undefined?fmt(o.PI,1).replace('-','−'):'—','PN-EN 12591, zał. A');
+  if(o.penSrc==='reg')row('Indeks penetracji PI z nachylenia A',fmt(o.PIA,1).replace('-','−'),'Pfeiffer i Van Doormaal');
+  row('T800, równoważna temperatura mięknienia',fT(o.T800),o.penSrc==='reg'?'prosta penetracji przy pen 800':'przyjęto T800 = PiK');
+  if(o.penSrc==='reg'&&isFinite(o.SP))row('Różnica PiK − T800',sgn(o.SP-o.T800,1)+' °C','dla klasy S blisko zera');
+  row('T1,25, równoważna temperatura łamliwości',fT(o.T125),'prosta penetracji przy pen 1,25');
+  if(isFinite(o.Fr)&&isFinite(o.T125))row('Różnica T<sub>Fraass</sub> − T1,25',sgn(o.Fr-o.T125,1)+' °C','dla klasy S blisko zera');
+  row('Zakres plastyczności PiK − T<sub>Fraass</sub>',isFinite(o.TZP)?fmt(o.TZP,1)+' °C':'—','z pomiarów');
+  row('Zakres plastyczności T800 − T1,25',isFinite(o.TZPe)?fmt(o.TZPe,1)+' °C':'—','z prostej penetracji');
+  if(o.C2>0){row('T<sub>1300</sub>, temperatura przy 1300 Pa·s',fT(o.T1300),o.visSrc==='fit'?'z linii lepkości':'przyjęto PiK');
+    row('Nachylenie linii lepkości C₂',fmt(o.C2,0)+' °C',o.C2S?`dla klasy S: ${fmt(o.C2S,0)} °C`:'')}
+  o.vis.filter(v=>v.etaS).forEach(v=>row(`Lepkość w ${fmt(v.T,v.T%1?1:0)} °C: pomiar wobec prostej S`,sgn(v.dev,0)+' %',`prognoza z penetracji i PiK: ${fEta(v.etaS)} Pa·s`,Math.abs(v.dev)>30?'bad':''));
+  o.eq.forEach(e=>row(`${e.name} (${e.lab})`,fT(e.T),o.eqSrc==='prognoza S'?'prognoza z prostej klasy S':o.eqSrc==='pomiar + PiK'?'linia przez PiK i jeden pomiar lepkości':o.eqSrc?'z linii lepkości':'brak danych'));
+  if(o.eta60H)row('Lepkość w 60 °C wg wzoru Heukeloma',fEta(o.eta60H)+' Pa·s','z PiK: C₁ = 8,5, C₂ = 110, 1300 Pa·s');
+  return R}
+
+function btdcConcl(o,s){const c=[],add=(cls,t)=>c.push({cls,t});
+  if(!o.pens.length||!isFinite(o.SP))add('bad','Brak penetracji w 25 °C lub temperatury mięknienia PiK. Bez nich nie da się wykreślić prostej penetracji.');
+  if(o.cls){const k=BT_CLS[o.cls];add(o.cls==='S'?'ok':'base',`${o.cls==='P'?'Linia lepkości wobec prostej z penetracji i PiK':k[0]}. Temperatura przy 1300 Pa·s z linii lepkości różni się od T800 o ${sgn(o.dT,1)} °C, a nachylenie linii lepkości wynosi ${fmt(o.q*100,0)} % nachylenia dla klasy S.`)}
+  else if(o.A>0)add('','Do określenia klasy potrzebne są lepkości w co najmniej dwóch temperaturach powyżej PiK. Linia lepkości na wykresie to prognoza dla klasy S.');
+  if(o.mod&&!o.cls)add('base','Próbka jest opisana jako modyfikowana. Karta BTDC powstała dla asfaltów niemodyfikowanych, więc klas S, B i W nie przypisuje się.');
+  if(o.PI!==undefined&&PI_REQ[s.grade]){const ok=o.PI>=-1.5&&o.PI<=0.7;add(ok?'ok':'bad',`Indeks penetracji ${fmt(o.PI,1).replace('-','−')} ${ok?'mieści się':'nie mieści się'} w przedziale od −1,5 do +0,7 dla asfaltu ${esc(s.grade)}.`)}
+  if(o.penSrc==='reg'&&isFinite(o.SP)&&Math.abs(o.SP-o.T800)>2)add('base',`PiK różni się od T800 o ${sgn(o.SP-o.T800,1)} °C. Przy dużej różnicy penetracja w temperaturze PiK nie wynosi 800, co zdarza się w asfaltach parafinowych i modyfikowanych.`);
+  if(isFinite(o.Fr)&&isFinite(o.T125)){const d=o.Fr-o.T125;add(Math.abs(d)<=3?'ok':'base',Math.abs(d)<=3?`Temperatura łamliwości Fraassa zgadza się z T1,25 (różnica ${sgn(d,1)} °C).`:`Temperatura łamliwości Fraassa różni się od T1,25 o ${sgn(d,1)} °C. ${d>0?'Asfalt jest w niskiej temperaturze bardziej kruchy, niż wynika z penetracji.':'Asfalt jest w niskiej temperaturze mniej kruchy, niż wynika z penetracji.'}`)}
+  const e=o.eq[0];if(o.eqSrc&&isFinite(e.T))add('',`Temperatura otaczania przy 0,2 Pa·s: ${fmt(e.T,0)} °C (${o.eqSrc==='prognoza S'?'prognoza z penetracji i PiK':'z pomiaru lepkości'}). Dla asfaltów modyfikowanych temperatury technologiczne przyjmuj według zaleceń producenta.`);
+  if(o.vis.some(v=>v.etaS&&Math.abs(v.dev)>30)&&o.cls==='S')add('base','Pojedyncza lepkość odbiega od prostej o ponad 30 %. Sprawdź ten pomiar.');
+  o.warn.forEach(w=>add('bad',w));
+  return c}
+
+let btText='';
+function renderBtdcSheet(s){const o=btdcCalc(s),rows=btdcRows(o,s),con=btdcConcl(o,s),k=o.cls?BT_CLS[o.cls]:null;
+  const chart=btdcChart(o),today=new Date().toISOString().slice(0,10);
+  const compTxt=compText((s.comps||[]).filter(c=>c.n&&c.n.trim()));
+  $('#btdcSheet').innerHTML=`<div class="bthead"><svg class="logo" width="46" height="46" aria-hidden="true"><use href="#logo"/></svg>
+    <div style="flex:1;min-width:0"><div class="bttitle">Karta jakości asfaltu</div><div class="norm">BTDC · Bitumen Test Data Chart (Heukelom)</div></div>
+    <div class="btstamp">Pavia<span class="lab">LAB</span><br><span>${today}</span></div></div>
+  <div class="tbl"><table class="metat"><tbody>
+    <tr><th>Próbka</th><td>${esc(label(s))}${s.code?' · '+esc(s.code):''}</td><th>Gatunek</th><td>${esc(gradeName(s))||'—'}</td></tr>
+    <tr><th>Opis / skład</th><td>${esc(s.desc||compTxt)||'—'}</td><th>Data badań</th><td>${esc(s.date||'')||'—'}${s.who?' · '+esc(s.who):''}</td></tr>
+  </tbody></table></div>
+  <div class="clsbox ${o.cls?'c'+o.cls:'cX'}"><div class="clsk">${o.cls?(o.cls==='M'?'—':o.cls==='P'?'PMB':o.cls):'?'}</div><div><b>${k?k[0]:'Klasa nieokreślona'}</b><p>${k?k[1]:'Klasę wyznacza się z położenia linii lepkości względem prostej penetracji. Wpisz lepkości w co najmniej dwóch temperaturach powyżej PiK.'}</p><span class="note" style="margin:0">Ocena orientacyjna, progi programu: |T₁₃₀₀ − T800| ≤ 4 °C i nachylenie 80–125 % nachylenia klasy S.</span></div></div>
+  <div class="chartcard btchart"><button class="sec chartcopy" data-copychart>Kopiuj wykres</button><h3>Wykres BTDC</h3>
+    <div class="legend"><span><i style="background:var(--accent);border-radius:50%"></i>penetracja</span><span><i style="background:var(--base);transform:rotate(45deg)"></i>PiK przy pen 800</span><span><i style="background:var(--bad);clip-path:polygon(50% 0,100% 100%,0 100%)"></i>Fraass przy pen 1,25</span><span><i style="background:var(--ok)"></i>lepkość</span><span><i style="background:none;border-top:2px dashed var(--muted);height:0;border-radius:0"></i>prosta klasy S</span><span><i style="background:none;border-top:2px dashed var(--accent-ink);height:0;border-radius:0"></i>0,2 / 2 / 20 Pa·s</span></div>
+    ${chart?`<div class="chart">${chart}</div>`:'<p class="note">Wykres pojawi się po wpisaniu penetracji i PiK.</p>'}</div>
+  <h3>Wyniki i wartości odczytane z karty</h3>
+  <div class="tbl"><table class="rest" id="btRes"><thead><tr><th>Parametr</th><th>Wartość</th><th>Podstawa</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td>${r.n}</td><td class="num${r.cls?' '+r.cls:''}"><b>${r.v}</b></td><td>${esc(r.b)}</td></tr>`).join('')}</tbody></table></div>
+  <h3 style="margin-top:18px">Wnioski</h3><ul class="concl">${con.map(x=>`<li class="${x.cls}">${x.t}</li>`).join('')}</ul>
+  <details class="btbase"><summary>Podstawa obliczeń</summary><ul class="meth">
+    <li>Prosta penetracji: log P = A·T + K. Przy jednej penetracji przyjmuje się, że w temperaturze PiK penetracja wynosi 800 ×0,1 mm.</li>
+    <li>PI = (20 − 500·A) / (1 + 50·A); z penetracji w 25 °C i PiK: PI = (20·T<sub>PiK</sub> + 500·log P − 1952) / (T<sub>PiK</sub> − 50·log P + 120).</li>
+    <li>T800 = T, przy której prosta penetracji daje 800; T1,25 = T800 − (log 800 − log 1,25) / A.</li>
+    <li>Linia lepkości wg WLF: log(η / 1300 Pa·s) = −8,5·(T − T<sub>1300</sub>) / (C₂ + T − T<sub>1300</sub>). Dopasowanie metodą najmniejszych kwadratów w skali karty.</li>
+    <li>Prosta klasy S: T<sub>1300</sub> = T800 i C₂ = ${fmt(BT.K,1)} / A. Stała ${fmt(BT.K,1)} to rekonstrukcja skali karty, opis w zakładce Literatura.</li>
+    <li>Temperatury technologiczne: 0,2 Pa·s otaczanie, 2 Pa·s pompowanie, 20 Pa·s koniec skutecznego zagęszczania.</li>
+    <li>Lepkość w 60 °C wg Heukeloma: log(η₆₀ / 1300) = −8,5·(60 − T<sub>PiK</sub>) / (110 + 60 − T<sub>PiK</sub>). Wzór zwykle zawyża wynik względem kapilary próżniowej.</li></ul></details>
+  <p class="note">Karta jest narzędziem pomocniczym opracowanym dla asfaltów niemodyfikowanych. Wiążące są wyniki badań wg norm. Źródła: zakładka Literatura, pozycje [18]–[28].</p>`;
+  btText=[`KARTA JAKOŚCI ASFALTU (BTDC) – ${label(s)}${s.code?' ('+s.code+')':''}, ${gradeName(s)}, ${s.date||''}`,`Klasa: ${k?k[0]:'nieokreślona'}`,'',...rows.map(r=>`${r.n.replace(/<[^>]+>/g,'')}\t${r.v}\t${r.b}`),'','Wnioski:',...con.map(x=>'- '+x.t.replace(/<[^>]+>/g,''))].join('\n')}
+
+document.addEventListener('change',e=>{if(e.target.id==='btSample'){btId=e.target.value;renderBtdc()}});
+document.addEventListener('input',e=>{const t=e.target,d=t.dataset;if(d.bt===undefined&&d.bp===undefined&&d.bv===undefined)return;const s=btSample();if(!s)return;const b=btNorm(s);
+  if(d.bt!==undefined)b[d.bt]=t.value;else{const[i,f]=(d.bp??d.bv).split(':');(d.bp!==undefined?b.pens:b.vis)[+i][f]=t.value}
+  save();renderBtdcSheet(s)});
+document.addEventListener('click',async e=>{const t=e.target.closest('button');if(!t)return;const s=btSample();
+  if(t.dataset.btadd&&s){const b=btNorm(s);b[t.dataset.btadd].push(t.dataset.btadd==='pens'?{T:'',P:''}:{T:'',v:''});save();renderBtdc();return}
+  if(t.dataset.btdel&&s){const b=btNorm(s),[k,i]=t.dataset.btdel.split(':');b[k].splice(+i,1);btNorm(s);save();renderBtdc();return}
+  if(t.dataset.btgo){cur=byId(t.dataset.btgo);show('tests');return}
+  if(t.id==='btPrint'){const sh=$('#btdcSheet');sh.classList.add('xl');const det=sh.querySelector('details');if(det)det.open=true;document.body.classList.add('pr-btdc');
+    const done=()=>{document.body.classList.remove('pr-btdc');sh.classList.remove('xl');removeEventListener('afterprint',done)};addEventListener('afterprint',done);window.print();setTimeout(done,1500);return}
+  if(t.id==='btCopy'&&s){t.disabled=true;try{const sh=$('#btdcSheet'),f='font:10pt Calibri,Arial,sans-serif',o=btdcCalc(s),k=o.cls?BT_CLS[o.cls]:null;
+      let h=`<h2 style="font:bold 15pt Calibri,Arial,sans-serif;margin:0">Karta jakości asfaltu (BTDC)</h2>`+tableHtml(sh.querySelector('.metat'))+
+        `<p style="${f}"><b>${k?k[0]:'Klasa nieokreślona'}.</b> ${k?esc(k[1]):''}</p>`+await chartBlock(sh.querySelector('.btchart'),640)+
+        `<p style="font:bold 11pt Calibri,Arial,sans-serif;margin:10pt 0 2pt">Wyniki i wartości odczytane z karty</p>`+tableHtml(sh.querySelector('#btRes'))+
+        `<p style="font:bold 11pt Calibri,Arial,sans-serif;margin:10pt 0 2pt">Wnioski</p><ul>${[...sh.querySelectorAll('.concl li')].map(li=>`<li style="${f}">${esc(li.textContent)}</li>`).join('')}</ul>`;
+      await writeClip(`<html><body>${h}</body></html>`,btText);t.disabled=false;flash(true,t)}
+    catch(err){t.disabled=false;try{await navigator.clipboard.writeText(btText);flash(true,t)}catch(e2){flash(false,t)}}}});
+
 function sampleCurve(peak,tail){let s='';for(let x=0;x<=400;x+=25){const f=x<=25?peak*x/25:peak*Math.exp(-(x-25)/70)+tail*(1-Math.exp(-(x-25)/120));s+=`${x};${f.toFixed(1).replace('.',',')}\n`}return s.trim()}
 if(!samples){
   const base=newSample({nr:'P-100/26',grade:'70/100',isBase:true,example:true,desc:'asfalt drogowy 70/100',who:'przykład'});applyGrade(base);
